@@ -5,6 +5,7 @@ extends Node
 # ============================================
 signal slime_changed(new_value: float)
 signal slimes_changed()
+signal combo_changed(count: int, multiplier: float)
 
 # ============================================
 # ВАЛЮТА
@@ -45,6 +46,25 @@ const SAVE_PATH := "user://save.cfg"
 const SAVE_INTERVAL := 5.0
 const SELL_PRICE_RATIO := 0.5
 
+# ============================================
+# СБОР КАПЕЛЬ: ПАССИВ vs АКТИВ
+# ============================================
+# Капля, съеденная лягушкой, приносит FROG_PAYOUT от стоимости:
+# лягушка — гарантированная подстилка, но заметно меньше ручного сбора.
+# Капля, собранная кликом, — полная стоимость плюс бонус за комбо.
+# Так клик всегда выгоднее автоматики, а у игрока появляется причина
+# смотреть на экран, а не просто ждать.
+const FROG_PAYOUT := 0.4
+
+# Комбо: собрал каплю раньше, чем истёкло COMBO_WINDOW секунд после
+# предыдущей — множитель вырос. Потолок x2.0.
+const COMBO_WINDOW := 1.5
+const COMBO_STEP := 0.1
+const COMBO_MAX := 10
+
+var combo: int = 0
+var combo_timer: float = 0.0
+
 var save_timer: float = 0.0
 
 # ============================================
@@ -60,6 +80,13 @@ func _process(delta):
 		save_timer = 0.0
 		save_game()
 
+	# Сброс комбо, если игрок перестал кликать
+	if combo > 0:
+		combo_timer -= delta
+		if combo_timer <= 0.0:
+			combo = 0
+			combo_changed.emit(combo, 1.0)
+
 func _notification(what):
 	if what == NOTIFICATION_WM_CLOSE_REQUEST:
 		save_game()
@@ -69,6 +96,27 @@ func _notification(what):
 # ============================================
 func add_slime(amount: float):
 	slime += amount
+
+# ============================================
+# СБОР КАПЛИ
+# ============================================
+# Единственная точка, где капля превращается в деньги. by_hand = true —
+# игрок кликнул, false — каплю съела лягушка.
+# Возвращает фактически начисленную сумму, чтобы показать её игроку.
+func collect_drop(value: float, by_hand: bool) -> float:
+	var payout: float = value * FROG_PAYOUT
+
+	if by_hand:
+		combo_timer = COMBO_WINDOW
+		combo = mini(combo + 1, COMBO_MAX)
+		payout = value * get_combo_multiplier()
+		combo_changed.emit(combo, get_combo_multiplier())
+
+	add_slime(payout)
+	return payout
+
+func get_combo_multiplier() -> float:
+	return 1.0 + COMBO_STEP * combo
 
 # ============================================
 # ТРАТА
@@ -218,6 +266,10 @@ func reset_progress():
 	slime_instances.clear()
 	_next_instance_uid = 1
 	_rebuild_indexes()
+
+	combo = 0
+	combo_timer = 0.0
+	combo_changed.emit(combo, 1.0)
 
 	save_game()
 	slimes_changed.emit()

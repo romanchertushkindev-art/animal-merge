@@ -25,7 +25,13 @@ class_name Frog
 # СОСТОЯНИЯ
 # ============================================
 enum State { IDLE, ATTACK, SWALLOW }
-var current_state: State = State.IDLE
+var current_state: State = State.IDLE:
+	set(value):
+		if current_state == value:
+			return
+		current_state = value
+		# Зона досягаемости рисуется только в покое — перерисовываем
+		queue_redraw()
 
 # ============================================
 # ТАЙМЕРЫ
@@ -207,7 +213,7 @@ func _collect_target():
 		return
 
 	if _target_drop.has_method("collect"):
-		_target_drop.collect()
+		_target_drop.collect(false)
 
 	_target_drop = null
 
@@ -232,6 +238,19 @@ func _draw_tongue(from_local: Vector2, to_local: Vector2):
 	if tongue == null:
 		return
 	tongue.points = PackedVector2Array([from_local, to_local])
+
+# ============================================
+# ЗОНА ДОСЯГАЕМОСТИ
+# ============================================
+# Лягушка ест только капли внутри attack_radius. Слизни появляются
+# случайно по всей ферме, поэтому без этого круга не видно, какая
+# часть поля кормит её сама, а какая зависит от кликов игрока.
+# Рисуем только в покое, чтобы не мешать анимации атаки.
+func _draw():
+	if current_state != State.IDLE:
+		return
+	draw_arc(Vector2.ZERO, attack_radius, 0.0, TAU, 64,
+		Color(0.45, 0.75, 0.55, 0.2), 2.0, true)
 
 # ============================================
 # ФЛИП

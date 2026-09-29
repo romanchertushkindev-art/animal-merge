@@ -116,23 +116,28 @@ func _on_input_event(viewport, event, shape_idx):
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 		collect()
 
-func collect():
+func collect(by_hand: bool = true):
 	if collected:
 		return
 	collected = true
 
+	# Единая точка начисления: лягушка платит FROG_PAYOUT, клик — полную
+	# цену с комбо. collect_drop возвращает фактически начисленное.
+	var payout: float = 0.0
 	if GameState:
-		GameState.add_slime(value)
+		payout = GameState.collect_drop(value, by_hand)
+	else:
+		payout = value
 
 	# Всплывающий текст над каплей
-	spawn_floating_text()
+	spawn_floating_text(payout, by_hand)
 
 	queue_free()
 
 # ============================================
 # ВСПЛЫВАЮЩИЙ ТЕКСТ
 # ============================================
-func spawn_floating_text():
+func spawn_floating_text(amount: float, by_hand: bool):
 	if FLOATING_TEXT_SCENE == null:
 		return
 
@@ -147,8 +152,18 @@ func spawn_floating_text():
 	ft.global_position = global_position + Vector2(0, -20)
 
 	# 3. ТОЛЬКО ТЕПЕРЬ запускаем setup — анимация начнётся с правильной позиции
-	var label_text = "+" + GameState.format_number(value)
-	ft.setup(label_text, drop_color)
+	var label_text = "+" + GameState.format_number(amount)
+
+	if by_hand:
+		# Множитель показываем только когда он что-то значит,
+		# иначе текст "+20 ×1.0" только засоряет экран
+		if GameState.combo > 1:
+			label_text += " ×%.1f" % GameState.get_combo_multiplier()
+		ft.setup(label_text, drop_color)
+	else:
+		# Пассивный доход от лягушки — тусклый, чтобы не спорить
+		# с ручным сбором за внимание
+		ft.setup(label_text, Color(0.55, 0.58, 0.65, 0.85))
 	
 # ============================================
 # КУРСОР
