@@ -4,7 +4,7 @@ extends Area2D
 # ============================================
 # ССЫЛКА НА СЦЕНУ ВСПЛЫВАЮЩЕГО ТЕКСТА
 # ============================================
-const FLOATING_TEXT_SCENE := preload("res://Resources/UI/floating_text.tscn")
+const FLOATING_TEXT_SCENE := preload("res://Resources/ui/floating_text.tscn")
 
 # ============================================
 # ДАННЫЕ (приходят от слизня)

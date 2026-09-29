@@ -3,7 +3,7 @@ class_name ShopContent
 
 @onready var item_list: VBoxContainer = %ItemList
 
-const SHOP_ITEM_SCENE := preload("res://Resources/UI/Dialogs/shop/shop_item.tscn")
+const SHOP_ITEM_SCENE := preload("res://Resources/ui/dialogs/shop/shop_item.tscn")
 
 func _ready():
 	if GameState:
