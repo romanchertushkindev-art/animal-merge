@@ -15,50 +15,59 @@ content_margin_bottom = 5.0
 texture = ExtResource("1_qcl1h")
 
 [node name="PanelContainer" type="PanelContainer" unique_id=1382283655]
-offset_right = 86.0
-offset_bottom = 94.0
+custom_minimum_size = Vector2(100, 102)
+offset_right = 100.0
+offset_bottom = 102.0
 size_flags_horizontal = 0
 theme_override_styles/panel = SubResource("StyleBoxTexture_v2o47")
 script = ExtResource("1_m1jtp")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=1386210409]
 layout_mode = 2
+theme_override_constants/separation = 2
 
 [node name="Icon" type="TextureRect" parent="VBoxContainer" unique_id=1628820645]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(32, 32)
+custom_minimum_size = Vector2(40, 40)
+custom_maximum_size = Vector2(40, 40)
+propagate_maximum_size = true
 layout_mode = 2
 size_flags_horizontal = 4
 texture = ExtResource("2_y63qo")
+expand_mode = 1
+stretch_mode = 5
 
 [node name="NameLabel" type="Label" parent="VBoxContainer" unique_id=324412062]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 11)
 layout_mode = 2
 theme_override_fonts/font = ExtResource("3_nc1vk")
 theme_override_font_sizes/font_size = 8
 text = "Зеленый "
 horizontal_alignment = 1
 vertical_alignment = 1
-autowrap_mode = 3
+clip_text = true
 
 [node name="CountLabel" type="Label" parent="VBoxContainer" unique_id=1304389447]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 11)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.3775282, 0.60326004, 0.47374547, 1)
 theme_override_fonts/font = ExtResource("3_nc1vk")
 theme_override_font_sizes/font_size = 8
 text = "-"
 horizontal_alignment = 1
-autowrap_mode = 3
+vertical_alignment = 1
 
 [node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer" unique_id=747258601]
 layout_mode = 2
 size_flags_vertical = 3
+theme_override_constants/separation = 2
 
 [node name="BuyButton" type="Button" parent="VBoxContainer/HBoxContainer" unique_id=1612806835]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(36, 20)
-custom_maximum_size = Vector2(36, 20)
+custom_minimum_size = Vector2(40, 22)
+custom_maximum_size = Vector2(40, 22)
 propagate_maximum_size = true
 layout_mode = 2
 size_flags_horizontal = 8
@@ -68,17 +77,17 @@ theme_override_colors/font_color = Color(0.20392157, 0.23921569, 0.36862746, 1)
 theme_override_colors/font_disabled_color = Color(0.25882354, 0.27058825, 0.29411766, 1)
 theme_override_constants/icon_max_width = 1
 theme_override_fonts/font = ExtResource("3_nc1vk")
-theme_override_font_sizes/font_size = 9
+theme_override_font_sizes/font_size = 8
 theme_override_styles/normal = ExtResource("4_kfqcf")
 theme_override_styles/pressed = ExtResource("4_kfqcf")
 theme_override_styles/disabled = ExtResource("5_vc3uq")
 theme_override_styles/focus = ExtResource("4_kfqcf")
-text = "Place"
+text = "Put"
 
 [node name="SellBtn" type="Button" parent="VBoxContainer/HBoxContainer" unique_id=919448993]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(36, 20)
-custom_maximum_size = Vector2(36, 20)
+custom_minimum_size = Vector2(46, 22)
+custom_maximum_size = Vector2(46, 22)
 propagate_maximum_size = true
 layout_mode = 2
 size_flags_horizontal = 8
@@ -88,9 +97,9 @@ theme_override_colors/font_color = Color(0.20392157, 0.23921569, 0.36862746, 1)
 theme_override_colors/font_disabled_color = Color(0.25882354, 0.27058825, 0.29411766, 1)
 theme_override_constants/icon_max_width = 1
 theme_override_fonts/font = ExtResource("3_nc1vk")
-theme_override_font_sizes/font_size = 9
+theme_override_font_sizes/font_size = 8
 theme_override_styles/normal = ExtResource("4_kfqcf")
 theme_override_styles/pressed = ExtResource("4_kfqcf")
 theme_override_styles/disabled = ExtResource("5_vc3uq")
 theme_override_styles/focus = ExtResource("4_kfqcf")
-text = "Sold"
+text = "Sell"

@@ -45,7 +45,6 @@ func setup(id: String, uid: int):
 		return
 
 	if icon:
-		icon.custom_minimum_size = Vector2(32, 32)
 		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		if slime_data.sheet_texture:
 			icon.texture = slime_data.shop_texture
@@ -82,7 +81,8 @@ func refresh():
 
 	if sell_button:
 		var price = GameState.get_sell_price(slime_id)
-		sell_button.text = "Sell\n" + GameState.format_number(price)
+		# Без переноса строки: в кнопке 48x6 две строки не помещались
+		sell_button.text = "Sell " + GameState.format_number(price)
 		sell_button.disabled = on_scene
 		sell_button.tooltip_text = "Сначала убери со сцены" if on_scene else ""
 

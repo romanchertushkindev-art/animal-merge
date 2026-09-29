@@ -4,6 +4,7 @@ class_name InventoryContent
 @onready var item_list: HFlowContainer = %ItemList
 
 const ITEM_SCENE := preload("res://Resources/ui/dialogs/inventory/inventory_item.tscn")
+const PIXEL_FONT := preload("res://Resources/fonts/pixelFont.ttf")
 
 func _ready():
 	if GameState:
@@ -32,6 +33,10 @@ func build():
 		var empty = Label.new()
 		empty.text = "Инвентарь пуст\nКупи слизня в магазине"
 		empty.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		empty.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		empty.add_theme_font_override("font", PIXEL_FONT)
+		empty.add_theme_font_size_override("font_size", 10)
+		empty.add_theme_color_override("font_color", Color(0.66, 0.68, 0.75))
 		item_list.add_child(empty)
 		return
 
