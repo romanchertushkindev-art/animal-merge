@@ -1,0 +1,24 @@
+[gd_scene format=3 uid="uid://bseqlwr611kpk"]
+
+[ext_resource type="Script" uid="uid://cd1p5cjf8rano" path="res://Scripts/slime/slime_drop.gd" id="1_50vrl"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_mca0q"]
+radius = 8.0
+
+[node name="Area2D" type="Area2D" unique_id=1967769409]
+z_index = 1
+script = ExtResource("1_50vrl")
+value = null
+drop_color = null
+flight_duration = 0.8
+pop_force = null
+horizontal_spread = null
+fall_gravity = 500.0
+idle_duration = null
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=659102297]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=597933180]
+rotation = -0.002526052
+scale = Vector2(0.99999994, 0.99999994)
+shape = SubResource("CircleShape2D_mca0q")

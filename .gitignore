@@ -1,0 +1,16 @@
+# Godot 4+ specific ignores
+.godot/
+/android/
+
+# Build output (38 MB, regenerable via Export → webBuild/)
+webBuild/
+
+# Editor temp leftovers (slime.tscn3141592.tmp, theme.tres.tmp, ...)
+*.tmp
+
+# OS / editor noise
+Thumbs.db
+desktop.ini
+.DS_Store
+.vscode/
+.idea/

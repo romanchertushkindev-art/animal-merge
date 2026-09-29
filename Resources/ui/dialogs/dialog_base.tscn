@@ -1,0 +1,82 @@
+[gd_scene format=3 uid="uid://blunx8nnprng2"]
+
+[ext_resource type="Script" uid="uid://gvpyy2hw7603" path="res://Scripts/ui/dialog.gd" id="1_37y8b"]
+[ext_resource type="Texture2D" uid="uid://cpf107xt2vpyu" path="res://Sprites/ui/shopBase.png" id="2_37y8b"]
+[ext_resource type="FontFile" uid="uid://mgslytvy8x0r" path="res://Resources/fonts/pixelFont.ttf" id="3_sgrid"]
+[ext_resource type="Texture2D" uid="uid://daim1xtt8hvxn" path="res://Sprites/ui/label.png" id="4_7754y"]
+[ext_resource type="Texture2D" uid="uid://b4cb4eijv53kl" path="res://Sprites/ui/cross.png" id="4_nwkds"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_v2o47"]
+texture = ExtResource("2_37y8b")
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_4rl5l"]
+texture = ExtResource("4_7754y")
+
+[node name="Shop" type="CanvasLayer" unique_id=602663576]
+script = ExtResource("1_37y8b")
+
+[node name="Dimmer" type="ColorRect" parent="." unique_id=1198362951]
+unique_name_in_owner = true
+offset_right = 640.0
+offset_bottom = 356.0
+size_flags_horizontal = 6
+size_flags_vertical = 6
+color = Color(0, 0, 0, 0.34901962)
+
+[node name="CenterContainer" type="CenterContainer" parent="Dimmer" unique_id=672995728]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -219.5
+offset_top = -128.0
+offset_right = 219.5
+offset_bottom = 128.0
+grow_horizontal = 2
+grow_vertical = 2
+metadata/_edit_use_anchors_ = true
+
+[node name="ShopPanel" type="PanelContainer" parent="Dimmer/CenterContainer" unique_id=312821198]
+texture_filter = 1
+custom_minimum_size = Vector2(439, 256)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxTexture_v2o47")
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="Dimmer/CenterContainer/ShopPanel" unique_id=1393740867]
+layout_mode = 2
+
+[node name="Header" type="HBoxContainer" parent="Dimmer/CenterContainer/ShopPanel/VBoxContainer2" unique_id=1557236619]
+layout_mode = 2
+size_flags_vertical = 0
+
+[node name="MarginContainer" type="MarginContainer" parent="Dimmer/CenterContainer/ShopPanel/VBoxContainer2/Header" unique_id=1293877911]
+layout_mode = 2
+theme_override_constants/margin_left = 18
+
+[node name="TitleLabel" type="Label" parent="Dimmer/CenterContainer/ShopPanel/VBoxContainer2/Header/MarginContainer" unique_id=3184746]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(194, 46)
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_sgrid")
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("StyleBoxTexture_4rl5l")
+text = "Магазин"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="MarginContainer2" type="MarginContainer" parent="Dimmer/CenterContainer/ShopPanel/VBoxContainer2/Header" unique_id=508104419]
+layout_mode = 2
+size_flags_horizontal = 10
+theme_override_constants/margin_left = 0
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+
+[node name="CloseBtn" type="TextureButton" parent="Dimmer/CenterContainer/ShopPanel/VBoxContainer2/Header/MarginContainer2" unique_id=1213773952]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_default_cursor_shape = 2
+texture_normal = ExtResource("4_nwkds")
+
+[node name="ContentSlot" type="MarginContainer" parent="Dimmer/CenterContainer/ShopPanel/VBoxContainer2" unique_id=375592122]
+unique_name_in_owner = true
+layout_mode = 2

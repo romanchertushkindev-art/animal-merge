@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="SlimeData" format=3 uid="uid://bktllfyd50bvv"]
+
+[ext_resource type="Texture2D" uid="uid://pkmatkiuckvt" path="res://Sprites/slimeDrops/green_drop.png" id="1_0uawr"]
+[ext_resource type="Script" uid="uid://tpoynsk281e3" path="res://Scripts/states/SlimeData.gd" id="2_lk77j"]
+[ext_resource type="Texture2D" uid="uid://cdmm7f08m3uy7" path="res://Sprites/slimes/slime.png" id="3_lk77j"]
+[ext_resource type="Texture2D" uid="uid://dnwmalqb28qt6" path="res://Sprites/slimes/slime_green_one.png" id="4_k81yk"]
+
+[sub_resource type="Gradient" id="Gradient_quqt7"]
+colors = PackedColorArray(0.12836537, 0.726062, 0.35659415, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_mk6ao"]
+gradient = SubResource("Gradient_quqt7")
+
+[resource]
+script = ExtResource("2_lk77j")
+display_name = "Зеленый"
+sheet_texture = ExtResource("3_lk77j")
+shop_texture = ExtResource("4_k81yk")
+unlock_price = 100.0
+speed = 100.0
+drop_texture = ExtResource("1_0uawr")
+drop_color = Color(0.09320182, 0.59000057, 0.47657922, 1)
+drop_value = 10.0
+trail_gradient = SubResource("GradientTexture1D_mk6ao")

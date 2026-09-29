@@ -1,0 +1,88 @@
+[gd_scene format=3 uid="uid://bihbv6aq56nrl"]
+
+[ext_resource type="Texture2D" uid="uid://cxv0yxup08w7v" path="res://Sprites/ui/itemRec.png" id="1_l1do3"]
+[ext_resource type="Script" uid="uid://ctwjfvkdxyi4r" path="res://Scripts/ui/shop/shop_item.gd" id="2_adwjv"]
+[ext_resource type="Texture2D" uid="uid://dnwmalqb28qt6" path="res://Sprites/slimes/slime_green_one.png" id="3_l1do3"]
+[ext_resource type="FontFile" uid="uid://mgslytvy8x0r" path="res://Resources/fonts/pixelFont.ttf" id="4_2ka3e"]
+[ext_resource type="StyleBox" uid="uid://caq4ebwgd8c07" path="res://Resources/tres/uiStyles/shop/shop_buybtn_normal.tres" id="5_0j8bl"]
+[ext_resource type="StyleBox" uid="uid://cfcyyt4m77egs" path="res://Resources/tres/uiStyles/shop/shop_buybtn_disabled.tres" id="6_icxa1"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_u7w0x"]
+texture = ExtResource("1_l1do3")
+
+[node name="ShopItem" type="PanelContainer" unique_id=2117426379]
+custom_minimum_size = Vector2(219, 42)
+offset_right = 156.0
+offset_bottom = 42.0
+theme_override_styles/panel = SubResource("StyleBoxTexture_u7w0x")
+script = ExtResource("2_adwjv")
+
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=1189836724]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_right = 20
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer" unique_id=1752838839]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="Icon" type="TextureRect" parent="MarginContainer/HBoxContainer" unique_id=1959308833]
+unique_name_in_owner = true
+custom_maximum_size = Vector2(30, 30)
+propagate_maximum_size = true
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 4
+offset_transform_scale = Vector2(8, 8)
+texture = ExtResource("3_l1do3")
+stretch_mode = 4
+
+[node name="MarginContainer2" type="MarginContainer" parent="MarginContainer/HBoxContainer" unique_id=1115293055]
+layout_mode = 2
+theme_override_constants/margin_left = 5
+
+[node name="Labels" type="VBoxContainer" parent="MarginContainer/HBoxContainer/MarginContainer2" unique_id=1560206132]
+custom_minimum_size = Vector2(82, 0)
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="NameLabel" type="Label" parent="MarginContainer/HBoxContainer/MarginContainer2/Labels" unique_id=1369233734]
+unique_name_in_owner = true
+texture_filter = 1
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_2ka3e")
+theme_override_font_sizes/font_size = 13
+text = "	Зелёный"
+
+[node name="CountLabel" type="Label" parent="MarginContainer/HBoxContainer/MarginContainer2/Labels" unique_id=418626743]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9509863, 0.9427116, 0.9677562, 1)
+theme_override_fonts/font = ExtResource("4_2ka3e")
+theme_override_font_sizes/font_size = 9
+text = "Куплено: 0"
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/HBoxContainer" unique_id=1392739487]
+layout_mode = 2
+size_flags_horizontal = 10
+size_flags_vertical = 4
+
+[node name="BuyButton" type="Button" parent="MarginContainer/HBoxContainer/MarginContainer" unique_id=40370005]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(36, 20)
+custom_maximum_size = Vector2(36, 20)
+propagate_maximum_size = true
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 4
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(0.20392157, 0.23921569, 0.36862746, 1)
+theme_override_colors/font_disabled_color = Color(0.25882354, 0.27058825, 0.29411766, 1)
+theme_override_constants/icon_max_width = 1
+theme_override_fonts/font = ExtResource("4_2ka3e")
+theme_override_font_sizes/font_size = 9
+theme_override_styles/normal = ExtResource("5_0j8bl")
+theme_override_styles/pressed = ExtResource("5_0j8bl")
+theme_override_styles/disabled = ExtResource("6_icxa1")
+theme_override_styles/focus = ExtResource("5_0j8bl")
+text = "100"

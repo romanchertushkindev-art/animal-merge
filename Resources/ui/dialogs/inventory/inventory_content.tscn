@@ -1,0 +1,26 @@
+[gd_scene format=3 uid="uid://br600xwlx3ahu"]
+
+[ext_resource type="Script" uid="uid://hc2au0m55doh" path="res://Scripts/ui/inventory/inventory_content.gd" id="1_bsq31"]
+
+[node name="InventoryContent" type="ScrollContainer" unique_id=835485147]
+clip_contents = false
+offset_right = 36.0
+offset_bottom = 8.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+script = ExtResource("1_bsq31")
+
+[node name="PanelContainer" type="Panel" parent="." unique_id=1519219121]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="ItemList" type="HFlowContainer" parent="PanelContainer" unique_id=1018883202]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 20.0
+offset_right = 28.0
+offset_bottom = 50.0
+size_flags_horizontal = 3
+size_flags_vertical = 3

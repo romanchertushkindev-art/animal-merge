@@ -1,0 +1,30 @@
+[gd_resource type="TileSet" format=3 uid="uid://xi2u2n27qqtw"]
+
+[ext_resource type="Texture2D" uid="uid://cnn6p1hd11msh" path="res://Sprites/flowerTulset.png" id="1_pbbqs"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_gacpl"]
+texture = ExtResource("1_pbbqs")
+texture_region_size = Vector2i(8, 8)
+0:0/0 = 0
+1:0/0 = 0
+2:0/0 = 0
+3:0/0 = 0
+3:0/0/y_sort_origin = 10
+4:0/0 = 0
+4:0/0/y_sort_origin = 10
+4:1/0 = 0
+4:1/0/y_sort_origin = 3
+3:1/0 = 0
+3:1/0/y_sort_origin = 3
+5:0/0 = 0
+6:1/0 = 0
+5:1/0 = 0
+6:0/0 = 0
+7:0/0 = 0
+7:1/0 = 0
+
+[resource]
+tile_size = Vector2i(8, 8)
+physics_layer_0/collision_layer = 2
+physics_layer_0/collision_mask = 0
+sources/1 = SubResource("TileSetAtlasSource_gacpl")

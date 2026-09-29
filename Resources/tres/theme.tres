@@ -1,0 +1,11 @@
+[gd_resource type="Theme" format=3 uid="uid://d2udtw5wnauxi"]
+
+[sub_resource type="ImageTexture" id="ImageTexture_4ae5a"]
+
+[resource]
+VScrollBar/icons/decrement = SubResource("ImageTexture_4ae5a")
+VScrollBar/icons/decrement_highlight = SubResource("ImageTexture_4ae5a")
+VScrollBar/icons/decrement_pressed = SubResource("ImageTexture_4ae5a")
+VScrollBar/icons/increment = SubResource("ImageTexture_4ae5a")
+VScrollBar/icons/increment_highlight = SubResource("ImageTexture_4ae5a")
+VScrollBar/icons/increment_pressed = SubResource("ImageTexture_4ae5a")

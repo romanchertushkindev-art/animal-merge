@@ -1,0 +1,7 @@
+[gd_resource type="StyleBoxTexture" format=3 uid="uid://dgckk5bh2ktat"]
+
+[ext_resource type="Texture2D" uid="uid://vfywkvc0c2xp" path="res://Sprites/ui/slotItem.png" id="1_snkb6"]
+
+[resource]
+content_margin_left = 8.0
+texture = ExtResource("1_snkb6")
