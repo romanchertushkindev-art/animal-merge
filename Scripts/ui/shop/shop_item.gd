@@ -49,29 +49,45 @@ func refresh():
 		return
 
 	var unlocked := GameState.has_slime(data.id)
-	var count := GameState.get_on_scene_count_of(data.id)
+	var on_scene := GameState.get_on_scene_count_of(data.id)
 	var cost := data.price if unlocked else data.unlock_price
 
 	if count_label:
-		count_label.text = ("Куплено: %d" % count) if unlocked else "Не открыт"
+		# Раньше здесь писалось «Куплено», но показывалось число слизней
+		# на сцене. Из-за этого покупка выглядела как потеря денег.
+		count_label.text = ("На сцене: %d" % on_scene) if unlocked else "Не открыт"
 
 	if buy_button:
 		buy_button.text = GameState.format_number(cost)
 
+		# Покупка уходит в ЗАПАС, а не сразу на ферму. Если свободных
+		# слотов нет — блокируем кнопку, иначе игрок тратит деньги в никуда
+		# и не получает дохода.
+		var slots_used: int = GameState.get_on_scene_count()
+		var no_slots := slots_used >= SlimeFactory.MAX_SLIMES_SLOT
 		var not_enough := GameState.slime < cost
 
-		buy_button.disabled = not_enough or _is_buying
+		buy_button.disabled = no_slots or not_enough or _is_buying
 
-		if not_enough:
+		if no_slots:
+			buy_button.tooltip_text = "Все слоты заняты (%d/%d) — сначала убери слизня со сцены" % [
+				slots_used, SlimeFactory.MAX_SLIMES_SLOT
+			]
+		elif not_enough:
 			buy_button.tooltip_text = "Не хватает слизи"
 		else:
-			buy_button.tooltip_text = ""
+			buy_button.tooltip_text = "Покупка уходит в запас — выстави его в инвентаре"
 
 # ============================================
 # ПОКУПКА
 # ============================================
 func _on_buy_pressed():
 	if _is_buying or data == null:
+		return
+
+	# Слоты могли кончиться, пока карточка висела открытой
+	if GameState.get_on_scene_count() >= SlimeFactory.MAX_SLIMES_SLOT:
+		refresh()
 		return
 
 	var unlocked := GameState.has_slime(data.id)
