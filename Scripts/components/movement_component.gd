@@ -124,17 +124,28 @@ func _handle_boundaries():
 	var pad = Vector2(boundary_padding, boundary_padding)
 	var min_pos = pad
 	var max_pos = _screen_size - pad
+	var bounced := false
 
 	if _parent.global_position.x < min_pos.x:
 		_parent.global_position.x = min_pos.x
 		direction.x = abs(direction.x)
+		bounced = true
 	elif _parent.global_position.x > max_pos.x:
 		_parent.global_position.x = max_pos.x
 		direction.x = -abs(direction.x)
+		bounced = true
 
 	if _parent.global_position.y < min_pos.y:
 		_parent.global_position.y = min_pos.y
 		direction.y = abs(direction.y)
+		bounced = true
 	elif _parent.global_position.y > max_pos.y:
 		_parent.global_position.y = max_pos.y
 		direction.y = -abs(direction.y)
+		bounced = true
+
+	# Отскок тоже меняет направление — сообщаем подписчикам,
+	# иначе слизень продолжал бы смотреть в стену до смены состояния.
+	if bounced:
+		last_direction = direction
+		direction_changed.emit(direction)

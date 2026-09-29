@@ -126,7 +126,9 @@ func _process(delta):
 		_process_grabbed(delta)
 		return
 
-	update_animation()
+	# Анимация НЕ обновляется каждый кадр: она зависит только от
+	# состояния и направления, а они приходят через сигналы
+	# move_state_changed / direction_changed (см. _connect_signals).
 
 func _tick_timers(delta: float):
 	if turn_cooldown > 0:
@@ -355,9 +357,30 @@ func set_sheet_texture(new_texture: Texture2D):
 	if new_texture == null:
 		return
 
-	var frames: SpriteFrames = sprite.sprite_frames.duplicate(true)
-	if frames == null:
-		return
+	sprite.sprite_frames = _get_frames_for(sprite.sprite_frames, new_texture)
+	_refresh_animation()
+
+# ============================================
+# КЭШ SPRITEFRAMES
+# ============================================
+# Раньше на каждом спавне слизня SpriteFrames глубоко дублировался
+# (duplicate(true) копирует все кадры и AtlasTexture заново).
+# Сборка идёт один раз на пару «базовый набор + текстура»,
+# дальше все слизни с одним атласом делят один ресурс.
+# Анимация хранится в самом AnimatedSprite2D, а не в SpriteFrames,
+# поэтому общий ресурс безопасен.
+static var _frames_cache: Dictionary = {}
+
+static func _get_frames_for(base_frames: SpriteFrames, new_texture: Texture2D) -> SpriteFrames:
+	var key := "%s|%s" % [base_frames.resource_path, new_texture.resource_path]
+	if key == "|":
+		# Ресурсы без пути (встроенные в сцену) — ключ по идентификатору
+		key = "%d|%d" % [base_frames.get_instance_id(), new_texture.get_instance_id()]
+
+	if _frames_cache.has(key):
+		return _frames_cache[key]
+
+	var frames: SpriteFrames = base_frames.duplicate(true)
 
 	for anim_name in frames.get_animation_names():
 		var frame_count = frames.get_frame_count(anim_name)
@@ -378,8 +401,8 @@ func set_sheet_texture(new_texture: Texture2D):
 
 			frames.set_frame(anim_name, i, new_atlas)
 
-	sprite.sprite_frames = frames
-	_refresh_animation()
+	_frames_cache[key] = frames
+	return frames
 
 func _refresh_animation():
 	var old = sprite.animation
