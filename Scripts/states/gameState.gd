@@ -26,8 +26,17 @@ var slimes: Dictionary = {}
 # ЭКЗЕМПЛЯРЫ СЛИЗНЕЙ
 # ============================================
 # [ { "id": "green", "uid": 1 }, { "id": "green", "uid": 2 }, ... ]
+# slime_instances остаётся источником истины: от него зависит формат
+# сохранения. Индексы ниже производные — только для быстрого поиска.
 var slime_instances: Array = []
 var _next_instance_uid: int = 1
+
+# uid -> экземпляр (Dictionary хранится по ссылке, правки видны сразу)
+var _by_uid: Dictionary = {}
+# uid -> true для тех, кто сейчас на сцене
+var _on_scene_uids: Dictionary = {}
+# id -> сколько таких экземпляров на сцене
+var _on_scene_by_id: Dictionary = {}
 
 # ============================================
 # НАСТРОЙКИ
@@ -84,22 +93,6 @@ func unlock_slime(slime_id: String):
 	slimes_changed.emit()
 	print("[GameState] Разблокирован тип: ", slime_id)
 
-func add_slime_instance(slime_id: String):
-	if not slimes.has(slime_id):
-		unlock_slime(slime_id)
-		return
-	slimes[slime_id].count += 1
-	slimes_changed.emit()
-
-func remove_slime_instance(slime_id: String) -> bool:
-	if not slimes.has(slime_id):
-		return false
-	if slimes[slime_id].count <= 0:
-		return false
-	slimes[slime_id].count -= 1
-	slimes_changed.emit()
-	return true
-
 func has_slime(slime_id: String) -> bool:
 	return slimes.has(slime_id) and slimes[slime_id].unlocked
 
@@ -125,7 +118,7 @@ func create_instance(slime_id: String) -> int:
 	slime_instances.append({
 		"id": slime_id,
 		"uid": uid,
-		"on_scene": false      # ← НОВОЕ: по умолчанию в запасе
+		"on_scene": false      # ← по умолчанию в запасе
 	})
 
 	if not slimes.has(slime_id):
@@ -136,28 +129,39 @@ func create_instance(slime_id: String) -> int:
 		}
 	slimes[slime_id].count += 1
 
+	_by_uid[uid] = slime_instances[slime_instances.size() - 1]
+
 	slimes_changed.emit()
 	return uid
-	
+
 func remove_instance_by_uid(uid: int) -> bool:
+	var inst: Dictionary = _by_uid.get(uid, {})
+	if inst.is_empty():
+		return false
+
+	var id = inst.id
+	var was_on_scene = inst.get("on_scene", false)
+
+	# Убираем из массива, сохраняя порядок
 	for i in slime_instances.size():
 		if slime_instances[i].uid == uid:
-			var id = slime_instances[i].id
 			slime_instances.remove_at(i)
+			break
 
-			# Синхронизируем счётчик типов
-			if slimes.has(id) and slimes[id].count > 0:
-				slimes[id].count -= 1
+	_by_uid.erase(uid)
+	if was_on_scene:
+		_on_scene_uids.erase(uid)
+		_dec_on_scene_count(id)
 
-			slimes_changed.emit()
-			return true
-	return false
+	# Синхронизируем счётчик типов
+	if slimes.has(id) and slimes[id].count > 0:
+		slimes[id].count -= 1
+
+	slimes_changed.emit()
+	return true
 
 func get_instance_by_uid(uid: int) -> Dictionary:
-	for inst in slime_instances:
-		if inst.uid == uid:
-			return inst
-	return {}
+	return _by_uid.get(uid, {})
 
 func get_all_instances() -> Array:
 	return slime_instances
@@ -201,6 +205,8 @@ func load_game():
 	slime_instances = cfg.get_value("game", "slime_instances", [])
 	_next_instance_uid = cfg.get_value("game", "next_instance_uid", 1)
 
+	_rebuild_indexes()
+
 # ============================================
 # СБРОС
 # ============================================
@@ -211,6 +217,7 @@ func reset_progress():
 	slimes.clear()
 	slime_instances.clear()
 	_next_instance_uid = 1
+	_rebuild_indexes()
 
 	save_game()
 	slimes_changed.emit()
@@ -244,35 +251,67 @@ func format_time(seconds: float) -> String:
 # УПРАВЛЕНИЕ "НА СЦЕНЕ / В ЗАПАСЕ"
 # ============================================
 func set_on_scene(uid: int, value: bool) -> bool:
-	for inst in slime_instances:
-		if inst.uid == uid:
-			inst.on_scene = value
-			slimes_changed.emit()
-			return true
-	return false
+	var inst: Dictionary = _by_uid.get(uid, {})
+	if inst.is_empty():
+		return false
+
+	var was: bool = inst.get("on_scene", false)
+	if was == value:
+		return true
+
+	inst.on_scene = value
+	if value:
+		_on_scene_uids[uid] = true
+		_inc_on_scene_count(inst.id)
+	else:
+		_on_scene_uids.erase(uid)
+		_dec_on_scene_count(inst.id)
+
+	slimes_changed.emit()
+	return true
 
 func is_on_scene(uid: int) -> bool:
-	for inst in slime_instances:
-		if inst.uid == uid:
-			return inst.get("on_scene", false)
-	return false
+	return _on_scene_uids.has(uid)
 
 func get_on_scene_instances() -> Array:
 	var result = []
-	for inst in slime_instances:
-		if inst.get("on_scene", false):
-			result.append(inst)
+	for uid in _on_scene_uids:
+		result.append(_by_uid[uid])
 	return result
 
 func get_on_scene_count() -> int:
-	return get_on_scene_instances().size()
-	
+	return _on_scene_uids.size()
+
 func get_on_scene_count_of(slime_id: String) -> int:
-	var count = 0
+	return _on_scene_by_id.get(slime_id, 0)
+
+func _inc_on_scene_count(slime_id: String):
+	_on_scene_by_id[slime_id] = _on_scene_by_id.get(slime_id, 0) + 1
+
+func _dec_on_scene_count(slime_id: String):
+	var left = _on_scene_by_id.get(slime_id, 0) - 1
+	if left > 0:
+		_on_scene_by_id[slime_id] = left
+	else:
+		_on_scene_by_id.erase(slime_id)
+
+# Пересобирает индексы из slime_instances.
+# Вызывается после загрузки и сброса — источник истины один.
+func _rebuild_indexes():
+	_by_uid.clear()
+	_on_scene_uids.clear()
+	_on_scene_by_id.clear()
+
 	for inst in slime_instances:
-		if inst.id == slime_id and inst.get("on_scene", false):
-			count += 1
-	return count
+		var uid = inst.get("uid", -1)
+		if uid < 0:
+			continue
+		_by_uid[uid] = inst
+		# В старых сохранениях поля on_scene может не быть
+		inst["on_scene"] = inst.get("on_scene", false)
+		if inst.on_scene:
+			_on_scene_uids[uid] = true
+			_inc_on_scene_count(inst.id)
 	
 func sell_instance(uid: int) -> bool:
 	# Находим экземпляр
