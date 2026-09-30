@@ -1,0 +1,8 @@
+[gd_resource type="StyleBoxTexture" format=3]
+
+[ext_resource type="Texture2D" path="res://Sprites/ui/slotItem.png" id="1_sel"]
+
+[resource]
+content_margin_left = 8.0
+texture = ExtResource("1_sel")
+modulate_color = Color(0.72, 1, 0.78, 1)

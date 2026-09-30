@@ -14,6 +14,7 @@ texture = ExtResource("1_l1do3")
 custom_minimum_size = Vector2(219, 42)
 offset_right = 156.0
 offset_bottom = 42.0
+size_flags_horizontal = 3
 theme_override_styles/panel = SubResource("StyleBoxTexture_u7w0x")
 script = ExtResource("2_adwjv")
 

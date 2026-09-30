@@ -1,50 +1,105 @@
 extends HBoxContainer
 class_name ShopContent
 
-@onready var item_list: VBoxContainer = %ItemList
+# Контейнер магазина: слева полоса вкладок, справа хост контента.
+# Сами вкладки не зашиты в сцену — они берутся из массива sections,
+# поэтому новый раздел добавляется файлом .tres, а не правкой .tscn.
+#
+# Контент строится лениво: сцена вкладки создаётся при первом
+# открытии и дальше просто показывается. Это заодно снимает
+# пересборку списка на каждый slime_changed.
 
-const SHOP_ITEM_SCENE := preload("res://Resources/ui/dialogs/shop/shop_item.tscn")
+@onready var tab_strip: VBoxContainer = %TabStrip
+@onready var tab_host: Control = %TabHost
 
-func _ready():
-	if GameState:
-		GameState.slime_changed.connect(_on_slime_changed)
-		GameState.slimes_changed.connect(_on_slimes_changed)
-	
-	build()
+@export var sections: Array[ShopSection] = []
 
-func _on_slime_changed(_value):
-	# Обновить все карточки (цены, доступность)
-	for item in item_list.get_children():
-		if item.has_method("refresh"):
-			item.refresh()
+# id -> уже созданная панель
+var _panels: Dictionary = {}
+# id -> кнопка вкладки
+var _buttons: Dictionary = {}
+var _group := ButtonGroup.new()
 
-func _on_slimes_changed():
-	if is_visible_in_tree():
-		build()
+# Стили табов. Раньше они жили в .tscn на каждой кнопке; теперь
+# кнопки создаются кодом, поэтому стили переносим сюда.
+const TAB_FONT := preload("res://Resources/fonts/pixelFont.ttf")
+const TAB_STYLE := preload("res://Resources/tres/uiStyles/shop/slot_normal.tres")
+const TAB_STYLE_SELECTED := preload("res://Resources/tres/uiStyles/shop/slot_selected.tres")
+const TAB_SIZE := Vector2(156, 36)
+const TAB_FONT_SIZE := 16
 
-func build():
-	if item_list == null:
-		push_error("[ShopContent] ItemList не найден")
+func _ready() -> void:
+	if sections.is_empty():
+		push_error("[ShopContent] sections пуст — вкладок не будет")
 		return
+	_build_tabs()
+	show_tab(sections[0].id)
 
-	# Очистка
-	for child in item_list.get_children():
-		child.queue_free()
+func _build_tabs() -> void:
+	for section in sections:
+		var button := _make_tab_button(section)
+		tab_strip.add_child(button)
+		_buttons[section.id] = button
+		button.pressed.connect(show_tab.bind(section.id))
 
-	# Список всех доступных слизней
-	for id in SlimeFactory.get_all_ids():
-		var data: SlimeData = SlimeFactory.get_data(id)
-		if data == null:
-			continue
+func _make_tab_button(section: ShopSection) -> Button:
+	var button := Button.new()
+	button.text = section.title
+	button.icon = section.icon
+	# toggle_mode + общая группа: нажатая вкладка остаётся нажатой,
+	# остальные автоматически отжимаются
+	button.toggle_mode = true
+	button.button_group = _group
+	button.alignment = HORIZONTAL_ALIGNMENT_LEFT
+	button.custom_minimum_size = TAB_SIZE
+	button.focus_mode = Control.FOCUS_NONE
 
-		var item = SHOP_ITEM_SCENE.instantiate()
-		item_list.add_child(item)
-		item.setup(data)
+	button.add_theme_font_override("font", TAB_FONT)
+	button.add_theme_font_size_override("font_size", TAB_FONT_SIZE)
+	button.add_theme_stylebox_override("normal", TAB_STYLE)
+	button.add_theme_stylebox_override("hover", TAB_STYLE)
+	button.add_theme_stylebox_override("focus", TAB_STYLE)
+	# У вкладки в нажатом состоянии наш стиль активной
+	button.add_theme_stylebox_override("pressed", TAB_STYLE_SELECTED)
+	button.add_theme_constant_override("h_separation", 15)
+	button.add_theme_constant_override("icon_max_width", 22)
+	return button
 
-func _exit_tree():
-	# Отписываемся от сигналов при закрытии
-	if GameState:
-		if GameState.slime_changed.is_connected(_on_slime_changed):
-			GameState.slime_changed.disconnect(_on_slime_changed)
-		if GameState.slimes_changed.is_connected(_on_slimes_changed):
-			GameState.slimes_changed.disconnect(_on_slimes_changed)
+func show_tab(id: String) -> void:
+	# Подсветка активной вкладки. Группа сама отожмёт остальные.
+	if _buttons.has(id):
+		(_buttons[id] as Button).button_pressed = true
+
+	if not _panels.has(id):
+		var section := _find_section(id)
+		if section == null:
+			push_warning("[ShopContent] нет вкладки «%s»" % id)
+			return
+		if section.content_scene == null:
+			push_warning("[ShopContent] у вкладки «%s» нет content_scene" % id)
+			return
+
+		var panel: Control = section.content_scene.instantiate()
+		tab_host.add_child(panel)
+		_panels[id] = panel
+
+	var target: Control = _panels[id]
+	for key in _panels.keys():
+		(_panels[key] as Control).visible = key == id
+	target.visible = true
+
+	# Цены могли уехать, пока вкладка была скрыта
+	if target.has_method("refresh"):
+		target.refresh()
+	_scroll_to_top(target)
+
+func _find_section(id: String) -> ShopSection:
+	for section in sections:
+		if section.id == id:
+			return section
+	return null
+
+func _scroll_to_top(panel: Control) -> void:
+	for child in panel.get_children():
+		if child is ScrollContainer:
+			(child as ScrollContainer).scroll_vertical = 0
