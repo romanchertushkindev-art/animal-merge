@@ -168,8 +168,11 @@ func _spawn_drop():
 	if "drop_color" in drop:
 		drop.drop_color = data.drop_color
 
-	get_parent().add_child(drop)
-	drop.global_position = global_position
+	# Ставим локальную позицию ДО add_child: иначе капля один кадр
+	# висит в левом верхнем углу (0,0), а потом телепортируется к слизню
+	var parent := get_parent()
+	drop.position = global_position - parent.global_position
+	parent.add_child(drop)
 
 func _get_drop_value() -> float:
 	if instance_uid >= 0 and GameState:

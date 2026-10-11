@@ -150,13 +150,13 @@ func spawn_floating_text(amount: float, by_hand: bool):
 	if ft == null:
 		return
 
-	# 1. Сначала добавляем в корень сцены
-	get_parent().add_child(ft)
+	# Ставим локальную позицию ДО add_child: иначе текст один кадр
+	# висит в левом верхнем углу (0,0), а потом телепортируется к капле
+	var parent := get_parent()
+	ft.position = global_position + Vector2(0, -20) - parent.global_position
+	parent.add_child(ft)
 
-	# 2. Устанавливаем позицию над каплей
-	ft.global_position = global_position + Vector2(0, -20)
-
-	# 3. ТОЛЬКО ТЕПЕРЬ запускаем setup — анимация начнётся с правильной позиции
+	# Только теперь setup — анимация начнётся с правильной позиции
 	var label_text = "+" + GameState.format_number(amount)
 
 	if by_hand:
