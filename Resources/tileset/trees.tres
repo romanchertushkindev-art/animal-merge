@@ -1,0 +1,46 @@
+[gd_resource type="TileSet" format=3 uid="uid://4pxn8pdcqox8"]
+
+[ext_resource type="Texture2D" uid="uid://patiyygctj8w" path="res://sprites/Slimes/TREETILESET.png" id="1_ecbak"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_i07o0"]
+texture = ExtResource("1_ecbak")
+texture_region_size = Vector2i(32, 32)
+0:0/0 = 0
+0:0/0/y_sort_origin = 160
+0:1/0 = 0
+0:1/0/y_sort_origin = 128
+1:0/0 = 0
+1:0/0/y_sort_origin = 160
+1:1/0 = 0
+1:1/0/y_sort_origin = 128
+1:2/0 = 0
+1:2/0/y_sort_origin = 96
+1:3/0 = 0
+1:3/0/y_sort_origin = 64
+1:4/0 = 0
+1:4/0/y_sort_origin = 32
+1:4/0/physics_layer_0/polygon_0/points = PackedVector2Array(-10.514814, -16, 10.514816, -16, 16, -2.2304153, 16, 12.426601, 2.2304153, 13.382492, -16, 11.152077, -16, -5.7353535)
+0:4/0 = 0
+0:4/0/y_sort_origin = 32
+0:4/0/physics_layer_0/polygon_0/points = PackedVector2Array(11.789337, 7.0098763, 16, 4.779461, 16, 12.745232, 12.107967, 11.789337)
+0:3/0 = 0
+0:3/0/y_sort_origin = 64
+0:2/0 = 0
+0:2/0/y_sort_origin = 96
+2:0/0 = 0
+2:0/0/y_sort_origin = 160
+2:1/0 = 0
+2:1/0/y_sort_origin = 128
+2:2/0 = 0
+2:2/0/y_sort_origin = 96
+2:3/0 = 0
+2:3/0/y_sort_origin = 64
+2:4/0 = 0
+2:4/0/y_sort_origin = 32
+2:4/0/physics_layer_0/polygon_0/points = PackedVector2Array(-16, 1.9117851, -11.470707, 11.152077, -16, 11.152077)
+
+[resource]
+tile_size = Vector2i(32, 32)
+physics_layer_0/collision_layer = 2
+physics_layer_0/collision_mask = 0
+sources/0 = SubResource("TileSetAtlasSource_i07o0")

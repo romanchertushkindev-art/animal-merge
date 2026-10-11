@@ -3,8 +3,8 @@ extends Node
 # ============================================
 # НАСТРОЙКИ
 # ============================================
-const SLIME_SCENE := preload("res://Resources/slime.tscn")
-const SLIMES_FOLDER := "res://Resources/slimesData/"
+const SLIME_SCENE := preload("res://Resources/slime/slime.tscn")
+const SLIMES_FOLDER := "res://Resources/slime/slimesData/"
 
 @export var MAX_SLIMES_SLOT: int = 5
 

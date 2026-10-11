@@ -1,0 +1,166 @@
+[gd_scene format=3 uid="uid://cg04t3bk775gn"]
+
+[ext_resource type="Script" uid="uid://dwudcrvviqgrf" path="res://Scripts/shop/shop.gd" id="1_7js3u"]
+[ext_resource type="Texture2D" uid="uid://cpf107xt2vpyu" path="res://sprites/UI/shopBase.png" id="2_2evpp"]
+[ext_resource type="FontFile" uid="uid://mgslytvy8x0r" path="res://Resources/Fonts/pixelFont.ttf" id="3_5jd3n"]
+[ext_resource type="Texture2D" uid="uid://b4cb4eijv53kl" path="res://sprites/UI/cross.png" id="4_exdw7"]
+[ext_resource type="StyleBox" uid="uid://dgckk5bh2ktat" path="res://Resources/tres/uiStyles/shop/slot_normal.tres" id="5_5okji"]
+[ext_resource type="Texture2D" uid="uid://dnwmalqb28qt6" path="res://sprites/Slimes/slime_green_one.png" id="6_gla76"]
+[ext_resource type="Texture2D" uid="uid://c3ql2sgs13pyy" path="res://sprites/UI/shopRec.png" id="7_8hut5"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_v2o47"]
+texture = ExtResource("2_2evpp")
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_ncpk5"]
+texture = ExtResource("7_8hut5")
+
+[node name="Dialog" type="CanvasLayer" unique_id=602663576]
+layer = 10
+script = ExtResource("1_7js3u")
+
+[node name="Dimmer" type="ColorRect" parent="." unique_id=1198362951]
+unique_name_in_owner = true
+offset_right = 640.0
+offset_bottom = 356.0
+size_flags_horizontal = 6
+size_flags_vertical = 6
+color = Color(0, 0, 0, 0.34901962)
+
+[node name="CenterContainer" type="CenterContainer" parent="Dimmer" unique_id=672995728]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ShopPanel" type="PanelContainer" parent="Dimmer/CenterContainer" unique_id=312821198]
+texture_filter = 1
+custom_minimum_size = Vector2(439, 256)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxTexture_v2o47")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Dimmer/CenterContainer/ShopPanel" unique_id=1393740867]
+layout_mode = 2
+
+[node name="Header" type="HBoxContainer" parent="Dimmer/CenterContainer/ShopPanel/VBoxContainer" unique_id=1557236619]
+layout_mode = 2
+size_flags_vertical = 0
+
+[node name="MarginContainer" type="MarginContainer" parent="Dimmer/CenterContainer/ShopPanel/VBoxContainer/Header" unique_id=1293877911]
+layout_mode = 2
+theme_override_constants/margin_left = 70
+
+[node name="Label" type="Label" parent="Dimmer/CenterContainer/ShopPanel/VBoxContainer/Header/MarginContainer" unique_id=3184746]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_5jd3n")
+theme_override_font_sizes/font_size = 16
+text = "Инвентарь"
+
+[node name="MarginContainer2" type="MarginContainer" parent="Dimmer/CenterContainer/ShopPanel/VBoxContainer/Header" unique_id=508104419]
+layout_mode = 2
+size_flags_horizontal = 10
+theme_override_constants/margin_left = 0
+theme_override_constants/margin_top = 30
+theme_override_constants/margin_right = 20
+
+[node name="CloseBtn" type="TextureButton" parent="Dimmer/CenterContainer/ShopPanel/VBoxContainer/Header/MarginContainer2" unique_id=1213773952]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_default_cursor_shape = 2
+texture_normal = ExtResource("4_exdw7")
+
+[node name="ContentSlot" type="MarginContainer" parent="Dimmer/CenterContainer/ShopPanel/VBoxContainer" unique_id=364411182]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="Dimmer/CenterContainer/ShopPanel/VBoxContainer" unique_id=232449258]
+visible = false
+layout_mode = 2
+
+[node name="MarginContainer2" type="MarginContainer" parent="Dimmer/CenterContainer/ShopPanel/VBoxContainer/HBoxContainer2" unique_id=2119027166]
+layout_mode = 2
+size_flags_vertical = 0
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Dimmer/CenterContainer/ShopPanel/VBoxContainer/HBoxContainer2/MarginContainer2" unique_id=352771053]
+layout_mode = 2
+size_flags_horizontal = 0
+
+[node name="Button2" type="Button" parent="Dimmer/CenterContainer/ShopPanel/VBoxContainer/HBoxContainer2/MarginContainer2/VBoxContainer" unique_id=268494717]
+custom_minimum_size = Vector2(156, 36)
+layout_mode = 2
+theme_override_constants/h_separation = 15
+theme_override_constants/icon_max_width = 22
+theme_override_fonts/font = ExtResource("3_5jd3n")
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = ExtResource("5_5okji")
+theme_override_styles/pressed = ExtResource("5_5okji")
+theme_override_styles/hover = ExtResource("5_5okji")
+text = "Слаймы"
+icon = ExtResource("6_gla76")
+alignment = 0
+
+[node name="Button" type="Button" parent="Dimmer/CenterContainer/ShopPanel/VBoxContainer/HBoxContainer2/MarginContainer2/VBoxContainer" unique_id=1705893550]
+custom_minimum_size = Vector2(156, 36)
+layout_mode = 2
+theme_override_constants/h_separation = 15
+theme_override_constants/icon_max_width = 22
+theme_override_fonts/font = ExtResource("3_5jd3n")
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = ExtResource("5_5okji")
+theme_override_styles/pressed = ExtResource("5_5okji")
+theme_override_styles/hover = ExtResource("5_5okji")
+text = "xxxxxxxxxxx"
+alignment = 0
+
+[node name="Button3" type="Button" parent="Dimmer/CenterContainer/ShopPanel/VBoxContainer/HBoxContainer2/MarginContainer2/VBoxContainer" unique_id=1255548131]
+custom_minimum_size = Vector2(156, 36)
+layout_mode = 2
+theme_override_constants/h_separation = 15
+theme_override_constants/icon_max_width = 22
+theme_override_fonts/font = ExtResource("3_5jd3n")
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = ExtResource("5_5okji")
+theme_override_styles/pressed = ExtResource("5_5okji")
+theme_override_styles/hover = ExtResource("5_5okji")
+text = "xxxxxxxxxxx"
+alignment = 0
+
+[node name="Button4" type="Button" parent="Dimmer/CenterContainer/ShopPanel/VBoxContainer/HBoxContainer2/MarginContainer2/VBoxContainer" unique_id=1349764179]
+custom_minimum_size = Vector2(156, 36)
+layout_mode = 2
+theme_override_constants/h_separation = 15
+theme_override_constants/icon_max_width = 22
+theme_override_fonts/font = ExtResource("3_5jd3n")
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = ExtResource("5_5okji")
+theme_override_styles/pressed = ExtResource("5_5okji")
+theme_override_styles/hover = ExtResource("5_5okji")
+text = "xxxxxxxxxxx"
+alignment = 0
+
+[node name="MarginContainer" type="MarginContainer" parent="Dimmer/CenterContainer/ShopPanel/VBoxContainer/HBoxContainer2" unique_id=307541239]
+layout_mode = 2
+theme_override_constants/margin_top = 10
+
+[node name="ScrollContainer" type="ScrollContainer" parent="Dimmer/CenterContainer/ShopPanel/VBoxContainer/HBoxContainer2/MarginContainer" unique_id=1435166044]
+custom_minimum_size = Vector2(241, 169)
+custom_maximum_size = Vector2(241, 169)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxTexture_ncpk5")
+
+[node name="Margins" type="MarginContainer" parent="Dimmer/CenterContainer/ShopPanel/VBoxContainer/HBoxContainer2/MarginContainer/ScrollContainer" unique_id=1816064339]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 2
+theme_override_constants/margin_left = 11
+theme_override_constants/margin_top = 15
+theme_override_constants/margin_right = 11
+theme_override_constants/margin_bottom = 0
+
+[node name="ItemList" type="HFlowContainer" parent="Dimmer/CenterContainer/ShopPanel/VBoxContainer/HBoxContainer2/MarginContainer/ScrollContainer/Margins" unique_id=635280554]
+unique_name_in_owner = true
+layout_mode = 2

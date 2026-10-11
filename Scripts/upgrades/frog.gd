@@ -5,7 +5,7 @@ class_name Frog
 # НАСТРОЙКИ — ЯЗЫК
 # ============================================
 @export_group("Язык")
-@export var attack_radius: float = 250.0
+@export var attack_radius: float = 10.0
 @export var attack_interval: float = 1.5
 @export var tongue_speed: float = 2000.0
 @export var swallow_duration: float = 0.4
@@ -14,9 +14,18 @@ class_name Frog
 @export_group("Атака")
 @export var windup_time: float = 0.15       # задержка перед вылетом языка
 
+# Какой это апгрейд ("frog", ...). Ставится UpgradeFactory при спавне
+# и вручную в сцене — по нему ферма узнаёт, что это «его» жаба,
+# и не плодит лишних при первой же покупке.
+@export var upgrade_id: String = ""
+
 # ============================================
 # ССЫЛКИ
 # ============================================
+# ВАЖНО: TongueLine обязан оставаться с position = (0, 0) и scale = (1, 1).
+# _draw_tongue пишет точки в локальных координатах жабы, поэтому любой
+# трансформ самого узла (например, если нарисовать линию мышкой в
+# редакторе) сдвинет язык с рта и сожмёт его длину.
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D
 @onready var tongue: Line2D = $TongueLine
 @onready var movement: MovementComponent = $Movement
@@ -250,7 +259,7 @@ func _draw():
 	if current_state != State.IDLE:
 		return
 	draw_arc(Vector2.ZERO, attack_radius, 0.0, TAU, 64,
-		Color(0.45, 0.75, 0.55, 0.2), 2.0, true)
+		Color(1.0, 1.0, 1.0, 0.5), 2.0, true)
 
 # ============================================
 # ФЛИП

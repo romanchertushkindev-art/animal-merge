@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="UpgradeData" format=3 uid="uid://b7awkkkop53dp"]
+
+[ext_resource type="PackedScene" uid="uid://dvi0d6pyxsuf4" path="res://Resources/upgrades/frog.tscn" id="1_vwe4e"]
+[ext_resource type="Script" uid="uid://cswdrudrwajr4" path="res://Scripts/states/data/upgradeData.gd" id="2_r5eql"]
+[ext_resource type="Texture2D" uid="uid://bju3vqtibrncg" path="res://Sprites/upgrades/frog.png" id="3_imohn"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_frog_icon"]
+atlas = ExtResource("3_imohn")
+region = Rect2(0, 48, 48, 48)
+
+[resource]
+script = ExtResource("2_r5eql")
+id = "frog"
+display_name = "Жаба"
+description = "Съедает капли, которые появляются рядом с ней. Каждая жаба работает сама по себе."
+shop_texture = SubResource("AtlasTexture_frog_icon")
+scene = ExtResource("1_vwe4e")
+unlock_price = 3000.0
+price = 3000.0
+price_growth = 1.7
+max_count = 1
+income_coverage = 0.26
+attack_radius = 100.0
+attack_interval = 0.1
+tongue_speed = 20000.0
+starter_count = 0

@@ -5,7 +5,7 @@ extends Area2D
 # КОНСТАНТЫ
 # ============================================
 const GROUP_NAME := "slimes"
-const DROP_SCENE := preload("res://Resources/slime_drop.tscn")   # ← preload
+const DROP_SCENE := preload("res://Resources/slime/slime_drop.tscn")   # ← preload
 
 const GRAB_HOLD_DELAY := 0.1
 const IDLE_AFTER_COLLISION := 1.0
@@ -160,7 +160,9 @@ func _spawn_drop():
 	if drop == null:
 		return
 
-	drop.value = data.drop_value
+	# Стоимость капли считается по уровню ЭТОГО экземпляра:
+	# уровень свой у каждого слизня, а не у всего вида
+	drop.value = _get_drop_value()
 	if "drop_texture" in drop:
 		drop.drop_texture = data.drop_texture
 	if "drop_color" in drop:
@@ -168,6 +170,13 @@ func _spawn_drop():
 
 	get_parent().add_child(drop)
 	drop.global_position = global_position
+
+func _get_drop_value() -> float:
+	if instance_uid >= 0 and GameState:
+		var value := GameState.get_instance_drop_value(instance_uid)
+		if value > 0.0:
+			return value
+	return data.drop_value
 
 # ============================================
 # СТОЛКНОВЕНИЯ

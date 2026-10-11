@@ -1,23 +1,22 @@
 [gd_scene format=3 uid="uid://fuh0sls2k658"]
 
-[ext_resource type="Script" path="res://Scripts/ui/shop/shop_content.gd" id="1_content"]
-[ext_resource type="Script" path="res://Scripts/ui/shop/shop_section.gd" id="2_section"]
+[ext_resource type="Script" uid="uid://puqxidl660e" path="res://Scripts/ui/shop/shop_content.gd" id="1_content"]
+[ext_resource type="Script" uid="uid://3cldqrvgt2c4" path="res://Scripts/ui/shop/shop_section.gd" id="2_section"]
 [ext_resource type="Resource" path="res://Resources/ui/dialogs/shop/section_slimes.tres" id="3_slimes"]
-[ext_resource type="Resource" path="res://Resources/ui/dialogs/shop/section_upgrades.tres" id="4_upgrades"]
+[ext_resource type="Resource" uid="uid://e0u77nbc8c6g" path="res://Resources/ui/dialogs/shop/section_upgrades.tres" id="4_upgrades"]
 
-[node name="ShopContent" type="HBoxContainer"]
+[node name="ShopContent" type="HBoxContainer" unique_id=1602871599]
 script = ExtResource("1_content")
 sections = Array[ExtResource("2_section")]([ExtResource("3_slimes"), ExtResource("4_upgrades")])
 
-[node name="TabStrip" type="VBoxContainer" parent="."]
+[node name="TabStrip" type="VBoxContainer" parent="." unique_id=531519301]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 0
 theme_override_constants/separation = 4
 
-[node name="TabHost" type="MarginContainer" parent="."]
+[node name="TabHost" type="MarginContainer" parent="." unique_id=469254252]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/margin_top = 10

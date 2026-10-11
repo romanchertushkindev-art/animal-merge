@@ -1,0 +1,38 @@
+[gd_scene format=3 uid="uid://bseqlwr611kpk"]
+
+[ext_resource type="Script" uid="uid://cd1p5cjf8rano" path="res://Scripts/slime/slime_drop.gd" id="1_50vrl"]
+[ext_resource type="Texture2D" uid="uid://pkmatkiuckvt" path="res://Sprites/slimeDrops/green_drop.png" id="2_yjwaq"]
+[ext_resource type="FontFile" uid="uid://mgslytvy8x0r" path="res://Resources/fonts/pixelFont.ttf" id="3_j5ini"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_mca0q"]
+radius = 8.0
+
+[node name="Area2D" type="Area2D" unique_id=1967769409]
+z_index = 1
+script = ExtResource("1_50vrl")
+drop_texture = ExtResource("2_yjwaq")
+flight_duration = 0.8
+horizontal_spread = 20.0
+fall_gravity = 500.0
+idle_duration = 5.0
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=659102297]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=597933180]
+rotation = -0.002526052
+scale = Vector2(0.99999994, 0.99999994)
+shape = SubResource("CircleShape2D_mca0q")
+
+[node name="Timer" type="Label" parent="." unique_id=311150530]
+offset_left = -4.0
+offset_top = -22.0
+offset_right = 5.0
+offset_bottom = -7.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 4
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_constants/outline_size = 2
+theme_override_fonts/font = ExtResource("3_j5ini")
+theme_override_font_sizes/font_size = 12
+text = "1"

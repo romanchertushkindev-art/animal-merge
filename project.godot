@@ -11,13 +11,14 @@ config_version=5
 [application]
 
 config/name="AnimalMerge"
-run/main_scene="uid://brcx25kat2v2p"
+run/main_scene="uid://c24sc0k4bs2q1"
 config/features=PackedStringArray("4.7", "Forward Plus")
 config/icon="res://icon.svg"
 
 [autoload]
 
 SlimeFactory="*uid://cxooqhq54c13f"
+UpgradeFactory="*res://Scripts/states/UpgradeFactory.gd"
 GameState="*uid://crlb6cty4k046"
 
 [display]
@@ -38,10 +39,9 @@ theme/custom="uid://d2udtw5wnauxi"
 [physics]
 
 3d/physics_engine="Jolt Physics"
+common/physics_interpolation=true
 
 [rendering]
 
 textures/canvas_textures/default_texture_filter=0
 rendering_device/driver.windows="d3d12"
-2d/snap/snap_2d_transforms_to_pixel=true
-2d/snap/snap_2d_vertices_to_pixel=true

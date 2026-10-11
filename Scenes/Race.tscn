@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://div1ryyj8ypeh"]
 
-[ext_resource type="PackedScene" uid="uid://t7rr057tj6sc" path="res://Resources/slime.tscn" id="1_an1tg"]
+[ext_resource type="PackedScene" uid="uid://t7rr057tj6sc" path="res://Resources/slime/slime.tscn" id="1_an1tg"]
 
 [node name="Race" type="Node2D" unique_id=771394919]
 

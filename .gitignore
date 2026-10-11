@@ -14,3 +14,21 @@ desktop.ini
 .DS_Store
 .vscode/
 .idea/
+
+# Session / tooling noise
+.resume-dump.txt
+.npm-cache/
+
+# Temp scenes / files left in repo root
+dialog.tscn
+node_2d.tscn
+runner_probe.tscn
+Scenes/SLIME.tscn
+Tilemap_color1.png
+Tilemap_color1.png.import
+eco_inventory.png.import
+eco_shop.png.import
+
+# Python cache
+__pycache__/
+*.pyc

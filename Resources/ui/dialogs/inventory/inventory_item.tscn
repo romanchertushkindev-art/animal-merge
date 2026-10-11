@@ -15,9 +15,9 @@ content_margin_bottom = 5.0
 texture = ExtResource("1_qcl1h")
 
 [node name="PanelContainer" type="PanelContainer" unique_id=1382283655]
-custom_minimum_size = Vector2(100, 102)
+custom_minimum_size = Vector2(100, 128)
 offset_right = 100.0
-offset_bottom = 102.0
+offset_bottom = 128.0
 size_flags_horizontal = 0
 theme_override_styles/panel = SubResource("StyleBoxTexture_v2o47")
 script = ExtResource("1_m1jtp")
@@ -58,6 +58,25 @@ theme_override_font_sizes/font_size = 8
 text = "-"
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="LevelBtn" type="Button" parent="VBoxContainer" unique_id=1977351520]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 22)
+custom_maximum_size = Vector2(90, 22)
+propagate_maximum_size = true
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(0.20392157, 0.23921569, 0.36862746, 1)
+theme_override_colors/font_disabled_color = Color(0.25882354, 0.27058825, 0.29411766, 1)
+theme_override_constants/icon_max_width = 1
+theme_override_fonts/font = ExtResource("3_nc1vk")
+theme_override_font_sizes/font_size = 8
+theme_override_styles/normal = ExtResource("4_kfqcf")
+theme_override_styles/pressed = ExtResource("4_kfqcf")
+theme_override_styles/disabled = ExtResource("5_vc3uq")
+theme_override_styles/focus = ExtResource("4_kfqcf")
+text = "Ур.1"
 
 [node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer" unique_id=747258601]
 layout_mode = 2

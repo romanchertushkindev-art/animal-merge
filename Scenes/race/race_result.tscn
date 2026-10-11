@@ -1,0 +1,78 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://Scripts/race/race_result.gd" id="1_res"]
+[ext_resource type="FontFile" path="res://Resources/fonts/pixelFont.ttf" id="2_font"]
+[ext_resource type="StyleBox" path="res://Resources/tres/uiStyles/shop/shop_buybtn_normal.tres" id="3_btn"]
+[ext_resource type="StyleBox" path="res://Resources/tres/uiStyles/shop/shop_buybtn_disabled.tres" id="4_btn_off"]
+
+[node name="RaceResult" type="VBoxContainer"]
+custom_minimum_size = Vector2(0, 0)
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 240.0
+offset_bottom = 150.0
+theme_override_constants/separation = 8
+alignment = 1
+script = ExtResource("1_res")
+
+[node name="ReasonLabel" type="Label" parent="."]
+unique_name_in_owner = true
+texture_filter = 1
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 11
+text = "Шипы: Выносливость 10, нужно 12"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="DistanceLabel" type="Label" parent="."]
+unique_name_in_owner = true
+texture_filter = 1
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 18
+text = "0 м"
+horizontal_alignment = 1
+
+[node name="RewardLabel" type="Label" parent="."]
+unique_name_in_owner = true
+texture_filter = 1
+layout_mode = 2
+theme_override_colors/font_color = Color(0.602, 0.898, 0.314, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 16
+text = "+0"
+horizontal_alignment = 1
+
+[node name="Buttons" type="HBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="RetryBtn" type="Button" parent="Buttons"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(100, 26)
+layout_mode = 2
+focus_mode = 0
+theme_override_colors/font_color = Color(0.20392157, 0.23921569, 0.36862746, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 11
+theme_override_styles/normal = ExtResource("3_btn")
+theme_override_styles/pressed = ExtResource("3_btn")
+theme_override_styles/disabled = ExtResource("4_btn_off")
+theme_override_styles/focus = ExtResource("3_btn")
+text = "Ещё раз"
+
+[node name="QuitBtn" type="Button" parent="Buttons"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(100, 26)
+layout_mode = 2
+focus_mode = 0
+theme_override_colors/font_color = Color(0.20392157, 0.23921569, 0.36862746, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 11
+theme_override_styles/normal = ExtResource("3_btn")
+theme_override_styles/pressed = ExtResource("3_btn")
+theme_override_styles/disabled = ExtResource("4_btn_off")
+theme_override_styles/focus = ExtResource("3_btn")
+text = "Выйти"

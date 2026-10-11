@@ -5,11 +5,16 @@ extends Node
 # ============================================
 signal slime_changed(new_value: float)
 signal slimes_changed()
-signal combo_changed(count: int, multiplier: float)
+signal upgrades_changed()
+signal click_multiplier_changed(multiplier: float, time_left: float)
 
 # ============================================
 # ВАЛЮТА
 # ============================================
+# Стартовый капитал: ровно столько, сколько стоит первый зелёный
+# слизень. Без стартового слизня на ферме — игрок сам покупает первого.
+const START_SLIME := 100.0
+
 var slime: float = 0.0:
 	set(value):
 		slime = value
@@ -26,9 +31,11 @@ var slimes: Dictionary = {}
 # ============================================
 # ЭКЗЕМПЛЯРЫ СЛИЗНЕЙ
 # ============================================
-# [ { "id": "green", "uid": 1 }, { "id": "green", "uid": 2 }, ... ]
+# [ { "id": "green", "uid": 1, "level": 1, "on_scene": true }, ... ]
 # slime_instances остаётся источником истины: от него зависит формат
 # сохранения. Индексы ниже производные — только для быстрого поиска.
+# Уровень свой у каждого экземпляра: прокачивается конкретный слизень,
+# а не весь вид.
 var slime_instances: Array = []
 var _next_instance_uid: int = 1
 
@@ -38,6 +45,16 @@ var _by_uid: Dictionary = {}
 var _on_scene_uids: Dictionary = {}
 # id -> сколько таких экземпляров на сцене
 var _on_scene_by_id: Dictionary = {}
+
+# ============================================
+# АПГРЕЙДЫ
+# ============================================
+# { "frog": { "count": 1, "unlocked": true }, ... }
+# В отличие от слизней у апгрейда нет запаса: count — это ровно
+# столько жаб должно стоять на ферме прямо сейчас. Покупка в
+# магазине увеличивает count, ферма ловит upgrades_changed и
+# сразу доставляет жабу на сцену.
+var upgrades: Dictionary = {}
 
 # ============================================
 # НАСТРОЙКИ
@@ -56,14 +73,27 @@ const SELL_PRICE_RATIO := 0.5
 # смотреть на экран, а не просто ждать.
 const FROG_PAYOUT := 0.4
 
-# Комбо: собрал каплю раньше, чем истёкло COMBO_WINDOW секунд после
-# предыдущей — множитель вырос. Потолок x2.0.
-const COMBO_WINDOW := 1.5
-const COMBO_STEP := 0.1
-const COMBO_MAX := 10
+# ============================================
+# МНОЖИТЕЛЬ КЛИКА
+# ============================================
+# Множителя нет, пока не куплен апгрейд: клик всегда приносит ровно
+# каплю. После покупки клики поднимают множитель ступеньками от x1.0
+# до x2.0, а если перестать собирать — он ступенька падает. Ступенька
+# на экране это одновременно и отсчёт: пока собираешь, он не кончится.
+const MULTIPLIER_ID := "multiplier"
+const MULTIPLIER_STEP := 0.1
+const MULTIPLIER_MIN := 1.0
+const MULTIPLIER_MAX := 2.0
+# Столько секунд есть на одну ступеньку. Раньше окно комбо было 1.5 с:
+# множитель падал раньше, чем игрок успевал его увидеть, и отсчёт
+# показывать было бессмысленно.
+const MULTIPLIER_STEP_SECONDS := 6.0
 
-var combo: int = 0
-var combo_timer: float = 0.0
+var click_multiplier: float = MULTIPLIER_MIN
+var click_multiplier_timer: float = 0.0
+# Последняя показанная целая секунда: событие нужно только когда
+# цифра на экране реально меняется, а не 60 раз в секунду
+var _multiplier_second_shown: int = -1
 
 var save_timer: float = 0.0
 
@@ -80,12 +110,29 @@ func _process(delta):
 		save_timer = 0.0
 		save_game()
 
-	# Сброс комбо, если игрок перестал кликать
-	if combo > 0:
-		combo_timer -= delta
-		if combo_timer <= 0.0:
-			combo = 0
-			combo_changed.emit(combo, 1.0)
+	_update_click_multiplier(delta)
+
+# Таймер идёт только пока есть что терять: при x1.0 отсчёт «до падения»
+# показывать незачем, и падать там нечему.
+func _update_click_multiplier(delta: float) -> void:
+	if not is_multiplier_unlocked() or click_multiplier <= MULTIPLIER_MIN:
+		return
+
+	click_multiplier_timer -= delta
+	var left := ceili(click_multiplier_timer)
+	if left != _multiplier_second_shown:
+		_multiplier_second_shown = left
+		click_multiplier_changed.emit(click_multiplier, click_multiplier_timer)
+
+	if click_multiplier_timer <= 0.0:
+		click_multiplier = maxf(click_multiplier - MULTIPLIER_STEP, MULTIPLIER_MIN)
+		click_multiplier_timer = MULTIPLIER_STEP_SECONDS
+		_multiplier_second_shown = -1
+		click_multiplier_changed.emit(click_multiplier, click_multiplier_timer)
+
+## Множитель появляется только после покупки апгрейда
+func is_multiplier_unlocked() -> bool:
+	return get_upgrade_count(MULTIPLIER_ID) > 0
 
 func _notification(what):
 	if what == NOTIFICATION_WM_CLOSE_REQUEST:
@@ -107,16 +154,23 @@ func collect_drop(value: float, by_hand: bool) -> float:
 	var payout: float = value * FROG_PAYOUT
 
 	if by_hand:
-		combo_timer = COMBO_WINDOW
-		combo = mini(combo + 1, COMBO_MAX)
-		payout = value * get_combo_multiplier()
-		combo_changed.emit(combo, get_combo_multiplier())
+		if is_multiplier_unlocked():
+			# Каждый собранный клик поднимает ступеньку и отодвигает падение
+			click_multiplier = minf(click_multiplier + MULTIPLIER_STEP, MULTIPLIER_MAX)
+			click_multiplier_timer = MULTIPLIER_STEP_SECONDS
+			_multiplier_second_shown = -1
+			click_multiplier_changed.emit(click_multiplier, click_multiplier_timer)
+		# Ставку жабы надо перебить ВСЕГДА, а не только при купленном
+		# апгрейде: иначе клик без множителя платил бы 40% от капли
+		payout = value * click_multiplier
 
+	# Без этой строки сумма считается, но в валюту не попадает:
+	# плавающий текст показывает payout, а слизи не прибавляется
 	add_slime(payout)
 	return payout
 
 func get_combo_multiplier() -> float:
-	return 1.0 + COMBO_STEP * combo
+	return click_multiplier
 
 # ============================================
 # ТРАТА
@@ -157,6 +211,81 @@ func get_all_owned_ids() -> Array:
 	return result
 
 # ============================================
+# АПГРЕЙДЫ (жабы и прочие помощники)
+# ============================================
+func has_upgrade(upgrade_id: String) -> bool:
+	return upgrades.has(upgrade_id) and upgrades[upgrade_id].unlocked
+
+func get_upgrade_count(upgrade_id: String) -> int:
+	if not upgrades.has(upgrade_id):
+		return 0
+	return upgrades[upgrade_id].count
+
+# Цена следующей покупки: первая копия стоит unlock_price,
+# каждая следующая — price (как у слизней).
+func get_upgrade_price(upgrade_id: String) -> float:
+	var data = UpgradeFactory.get_data(upgrade_id)
+	if data == null:
+		return 0.0
+	return data.get_copy_price(get_upgrade_count(upgrade_id))
+
+# Покупка в магазине. Деньги списываются здесь же, чтобы карточка
+# не могла заплатить дважды. Возвращает false, если не хватило
+# слизи или упёрлись в max_count.
+func buy_upgrade(upgrade_id: String) -> bool:
+	var data = UpgradeFactory.get_data(upgrade_id)
+	if data == null:
+		return false
+
+	var count := get_upgrade_count(upgrade_id)
+	if data.max_count > 0 and count >= data.max_count:
+		push_warning("[GameState] buy_upgrade: лимит «%s» (%d)" % [upgrade_id, data.max_count])
+		return false
+
+	if not spend_slime(data.get_effective_price(has_upgrade(upgrade_id))):
+		return false
+
+	upgrades[upgrade_id] = {
+		"count": count + 1,
+		"unlocked": true
+	}
+	upgrades_changed.emit()
+	print("[GameState] Куплен апгрейд: ", upgrade_id, " (", count + 1, ")")
+	return true
+
+# Стартовые слизни. Без них новая игра начинается с нулём денег и
+# без единого слизня на ферме: до первой капли заработать негде,
+# а купить первого слизня тоже не на что — тупик. Стартовые ставим
+# только те, которых ещё нет в сохранении, иначе сброс и старые
+# сейвы ломались бы.
+func _apply_starter_slimes() -> void:
+	for slime_id in SlimeFactory.get_all_ids():
+		var data: SlimeData = SlimeFactory.get_data(slime_id)
+		if data == null or data.starter_count <= 0:
+			continue
+
+		var need: int = data.starter_count - get_slime_count(slime_id)
+		for i in need:
+			var uid := create_instance(slime_id)
+			set_on_scene(uid, true)
+			print("[GameState] Стартовый слизень: ", slime_id, " (uid ", uid, ")")
+
+# Стартовые апгрейды. Ставим только те, которых ещё нет в сохранении:
+# иначе сброс прогресса и старые сейвы ломались бы.
+func _apply_starter_upgrades() -> void:
+	for upgrade_id in UpgradeFactory.get_all_ids():
+		if upgrades.has(upgrade_id):
+			continue
+		var data: UpgradeData = UpgradeFactory.get_data(upgrade_id)
+		if data == null or data.starter_count <= 0:
+			continue
+		upgrades[upgrade_id] = {
+			"count": data.starter_count,
+			"unlocked": true
+		}
+		print("[GameState] Стартовый апгрейд: ", upgrade_id, " x", data.starter_count)
+
+# ============================================
 # ЭКЗЕМПЛЯРЫ (конкретные слизни)
 # ============================================
 func create_instance(slime_id: String) -> int:
@@ -166,6 +295,7 @@ func create_instance(slime_id: String) -> int:
 	slime_instances.append({
 		"id": slime_id,
 		"uid": uid,
+		"level": 1,
 		"on_scene": false      # ← по умолчанию в запасе
 	})
 
@@ -215,6 +345,120 @@ func get_all_instances() -> Array:
 	return slime_instances
 
 # ============================================
+# ЦЕНЫ (экспоненциальные)
+# ============================================
+# Раньше цена копии была фиксированной, а зелёный ронял по 1000 слизи
+# за каплю: одна капля — и весь магазин куплен. Теперь цена растёт
+# на price_growth за каждую уже купленную копию, а уровень — на
+# level_growth за каждый текущий.
+func get_copy_price(slime_id: String) -> float:
+	var data := SlimeFactory.get_data(slime_id)
+	if data == null:
+		return 0.0
+	return data.get_copy_price(get_slime_count(slime_id))
+
+func get_level_price(uid: int) -> float:
+	var inst := get_instance_by_uid(uid)
+	if inst.is_empty():
+		return 0.0
+	var data := SlimeFactory.get_data(inst.id)
+	if data == null:
+		return 0.0
+	return data.get_level_price(get_instance_level(uid))
+
+# ============================================
+# УРОВНИ ЭКЗЕМПЛЯРА
+# ============================================
+func get_instance_level(uid: int) -> int:
+	var inst := get_instance_by_uid(uid)
+	if inst.is_empty():
+		return 1
+	return maxi(int(inst.get("level", 1)), 1)
+
+func is_max_level(uid: int) -> bool:
+	var inst := get_instance_by_uid(uid)
+	if inst.is_empty():
+		return true
+	var data := SlimeFactory.get_data(inst.id)
+	if data == null:
+		return true
+	return get_instance_level(uid) >= data.max_level
+
+## Покупка уровня. Деньги списываются здесь же, чтобы карточка
+## инвентаря не могла заплатить дважды.
+func level_up_instance(uid: int) -> bool:
+	var inst := get_instance_by_uid(uid)
+	if inst.is_empty():
+		return false
+
+	var data := SlimeFactory.get_data(inst.id)
+	if data == null:
+		return false
+
+	var level := get_instance_level(uid)
+	if level >= data.max_level:
+		return false
+
+	if not spend_slime(data.get_level_price(level)):
+		return false
+
+	inst.level = level + 1
+	slimes_changed.emit()
+	print("[GameState] Уровень %d → %d (uid %d)" % [level, level + 1, uid])
+	return true
+
+## Сколько стоит капля этого экземпляра с учётом его уровня
+func get_instance_drop_value(uid: int) -> float:
+	var inst := get_instance_by_uid(uid)
+	if inst.is_empty():
+		return 0.0
+	var data := SlimeFactory.get_data(inst.id)
+	if data == null:
+		return 0.0
+	return data.get_drop_value(get_instance_level(uid))
+
+## Гонковый стат экземпляра с учётом его уровня. stat — имя из
+## SlimeData.RACE_STATS. Гонка спрашивает статы именно здесь, иначе
+## прокачка на ферме осталась бы незаметной на трассе.
+func get_instance_race_stat(uid: int, stat: String) -> float:
+	var inst := get_instance_by_uid(uid)
+	if inst.is_empty():
+		return 0.0
+	var data := SlimeFactory.get_data(inst.id)
+	if data == null:
+		return 0.0
+	return data.get_race_stat(stat, get_instance_level(uid))
+
+## Сколько ферма зарабатывает в секунду прямо сейчас: сумма стоимостей
+## капель всех слизней на сцене, делённая на их интервал.
+## Гонка считает от этой величины награду за забег — фиксированная
+## сумма там не годится: она либо ломает раннюю кривую, либо на
+## поздней не заметна вовсе.
+func get_farm_income_per_second() -> float:
+	var total := 0.0
+	for uid in _on_scene_uids.keys():
+		var inst: Dictionary = _by_uid.get(uid, {})
+		if inst.is_empty():
+			continue
+		var data := SlimeFactory.get_data(inst.id)
+		if data == null:
+			continue
+		var interval: float = (data.min_drop_interval + data.max_drop_interval) * 0.5
+		total += get_instance_drop_value(int(uid)) / maxf(interval, 0.1)
+
+	# Апгрейды собирают часть капель сами, но платят за них поменьше
+	for upgrade_id in upgrades.keys():
+		var count := get_upgrade_count(upgrade_id)
+		if count <= 0:
+			continue
+		var udata := UpgradeFactory.get_data(upgrade_id)
+		if udata == null or udata.income_coverage <= 0.0:
+			continue
+		total *= 1.0 + float(count) * udata.income_coverage * FROG_PAYOUT
+
+	return total
+
+# ============================================
 # ПРОДАЖА
 # ============================================
 func get_sell_price(slime_id: String) -> float:
@@ -231,6 +475,8 @@ func save_game():
 	cfg.set_value("game", "slime", slime)
 	cfg.set_value("game", "slimes", slimes)
 	cfg.set_value("game", "slime_instances", slime_instances)
+	cfg.set_value("game", "upgrades", upgrades)
+	cfg.set_value("game", "click_multiplier", click_multiplier)
 	cfg.set_value("game", "next_instance_uid", _next_instance_uid)
 	cfg.set_value("game", "last_save_time", Time.get_unix_time_from_system())
 	cfg.save(SAVE_PATH)
@@ -244,13 +490,19 @@ func load_game():
 
 	if err != OK:
 		print("[GameState] Нет сохранения — новый запуск")
+		slime = START_SLIME
 		return
 
 	slime = cfg.get_value("game", "slime", 0.0)
+	# Множитель не сохраняем: он и так падает, а через паузу вставать
+	# на середину шкалы без причины незачем. Стартует с x1.0.
+	click_multiplier = clampf(cfg.get_value("game", "click_multiplier", MULTIPLIER_MIN),
+		MULTIPLIER_MIN, MULTIPLIER_MAX)
 	total_slime_earned = cfg.get_value("game", "total_slime_earned", 0.0)
 
 	slimes = cfg.get_value("game", "slimes", {})
 	slime_instances = cfg.get_value("game", "slime_instances", [])
+	upgrades = cfg.get_value("game", "upgrades", {})
 	_next_instance_uid = cfg.get_value("game", "next_instance_uid", 1)
 
 	_rebuild_indexes()
@@ -259,7 +511,10 @@ func load_game():
 # СБРОС
 # ============================================
 func reset_progress():
-	slime = 100
+	# Стартовый капитал без стартовых слизней и апгрейдов: игрок
+	# покупает первого слизня сам — на 100 слизи хватает ровно на
+	# первого зелёного (unlock_price = 100).
+	slime = START_SLIME
 	total_slime_earned = 0.0
 
 	slimes.clear()
@@ -267,12 +522,16 @@ func reset_progress():
 	_next_instance_uid = 1
 	_rebuild_indexes()
 
-	combo = 0
-	combo_timer = 0.0
-	combo_changed.emit(combo, 1.0)
+	upgrades.clear()
+
+	click_multiplier = MULTIPLIER_MIN
+	click_multiplier_timer = 0.0
+	_multiplier_second_shown = -1
+	click_multiplier_changed.emit(click_multiplier, click_multiplier_timer)
 
 	save_game()
 	slimes_changed.emit()
+	upgrades_changed.emit()
 
 	print("[GameState] Прогресс сброшен")
 
@@ -286,7 +545,11 @@ func format_number(n: float) -> String:
 		return "%.2fM" % (n / 1_000_000.0)
 	elif n >= 1_000:
 		return "%.2fK" % (n / 1_000.0)
-	return str(int(n))
+	elif n >= 1.0:
+		return str(int(n))
+	# Ниже единицы округлять нельзя: жаба платит долю капли, и
+	# int(0.4) превращал честную награду в «+0»
+	return "%.1f" % n
 
 func format_time(seconds: float) -> String:
 	var s = int(seconds)
@@ -359,7 +622,8 @@ func _rebuild_indexes():
 		if uid < 0:
 			continue
 		_by_uid[uid] = inst
-		# В старых сохранениях поля on_scene может не быть
+		# В старых сохранениях полей level и on_scene может не быть
+		inst["level"] = maxi(int(inst.get("level", 1)), 1)
 		inst["on_scene"] = inst.get("on_scene", false)
 		if inst.on_scene:
 			_on_scene_uids[uid] = true

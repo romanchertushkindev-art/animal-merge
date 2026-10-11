@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="UpgradeData" format=3]
+
+[ext_resource type="Script" path="res://Scripts/states/data/upgradeData.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://Sprites/upgrades/frog.png" id="2_icon"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_multiplier_icon"]
+atlas = ExtResource("2_icon")
+region = Rect2(0, 48, 48, 48)
+
+[resource]
+script = ExtResource("1_script")
+id = "multiplier"
+display_name = "Множитель клика"
+description = "Клики по каплям начинают поднимать множитель с x1.0 до x2.0. Перестали собирать — ступенька падает, на экране видно, сколько до этого осталось."
+shop_texture = SubResource("AtlasTexture_multiplier_icon")
+unlock_price = 1000.0
+price = 1000.0
+price_growth = 1.7
+max_count = 1

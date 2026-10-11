@@ -9,8 +9,11 @@ const FLOATING_TEXT_SCENE := preload("res://Resources/ui/floating_text.tscn")
 # ============================================
 # ДАННЫЕ (приходят от слизня)
 # ============================================
+# drop_color красит только саму каплю. Цвет всплывающего текста
+# задаётся в floating_text.tscn по стилю (рукой / лягушка) —
+# раньше он тянулся отсюда, и ручной сбор всегда был зелёным.
 @export var value: float = 1.0
-@export var drop_color: Color = Color(0.3, 1.0, 0.4, 1.0)
+@export var drop_color: Color = Color(1, 1, 1, 1)
 @export var drop_texture: Texture2D
 
 # ============================================
@@ -30,7 +33,7 @@ const FLOATING_TEXT_SCENE := preload("res://Resources/ui/floating_text.tscn")
 # ССЫЛКИ
 # ============================================
 @onready var sprite: Sprite2D = $Sprite2D
-
+@onready var timerLabel: Label = $Timer
 # ============================================
 # СОСТОЯНИЕ
 # ============================================
@@ -98,7 +101,9 @@ func start_idle():
 
 func process_idle(delta):
 	idle_timer -= delta
-
+	
+	timerLabel.text = "%d" % ceil(idle_timer)
+	
 	# Плавное затухание за последнюю секунду
 	if idle_timer < 1.0:
 		modulate.a = max(idle_timer, 0.0)
@@ -157,13 +162,16 @@ func spawn_floating_text(amount: float, by_hand: bool):
 	if by_hand:
 		# Множитель показываем только когда он что-то значит,
 		# иначе текст "+20 ×1.0" только засоряет экран
-		if GameState.combo > 1:
-			label_text += " ×%.1f" % GameState.get_combo_multiplier()
-		ft.setup(label_text, drop_color)
+		var multiplayer = GameState.get_combo_multiplier()
+
+		if multiplayer > 1.0:
+			label_text += " ×%.1f" % multiplayer
+
+		ft.setup(label_text, FloatingText.Style.MANUAL, multiplayer)
 	else:
-		# Пассивный доход от лягушки — тусклый, чтобы не спорить
+		# Пассивный доход от лягушки — тише, чтобы не спорить
 		# с ручным сбором за внимание
-		ft.setup(label_text, Color(0.55, 0.58, 0.65, 0.85))
+		ft.setup(label_text, FloatingText.Style.PASSIVE)
 	
 # ============================================
 # КУРСОР

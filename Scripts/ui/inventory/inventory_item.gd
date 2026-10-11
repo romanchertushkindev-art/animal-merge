@@ -9,6 +9,7 @@ class_name InventoryItem
 @onready var count_label: Label = %CountLabel
 @onready var toggle_button: Button = %BuyButton
 @onready var sell_button: Button = %SellBtn
+@onready var level_button: Button = %LevelBtn
 
 # ============================================
 # ДАННЫЕ
@@ -16,8 +17,11 @@ class_name InventoryItem
 var instance_uid: int = -1
 var slime_id: String = ""
 var slime_data: SlimeData
+var select_mode: bool = false
 
 signal changed()
+# Клик по карточке в режиме выбора (см. select_mode в InventoryContent)
+signal picked(instance_uid: int, slime_id: String)
 
 # ============================================
 # ИНИЦИАЛИЗАЦИЯ
@@ -35,7 +39,13 @@ func _ready():
 		sell_button.pressed.connect(_on_sell)
 		sell_button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 
-func setup(id: String, uid: int):
+	if level_button:
+		if level_button.pressed.is_connected(_on_level_up):
+			level_button.pressed.disconnect(_on_level_up)
+		level_button.pressed.connect(_on_level_up)
+		level_button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+
+func setup(id: String, uid: int, in_select_mode: bool = false):
 	slime_id = id
 	instance_uid = uid
 	slime_data = SlimeFactory.get_data(id)
@@ -52,7 +62,40 @@ func setup(id: String, uid: int):
 	if name_label:
 		name_label.text = slime_data.display_name
 
+	_apply_select_mode(in_select_mode)
+
 	refresh()
+
+# ============================================
+# РЕЖИМ ВЫБОРА
+# ============================================
+# Когда инвентарь открыт на выбор (например, «кто поедет в гонку»),
+# карточка сама становится кнопкой: кнопки Put/Sell прячем, а клик
+# по карточке отдаёт слизня наружу через сигнал picked.
+func _apply_select_mode(enabled: bool) -> void:
+	select_mode = enabled
+	if not select_mode:
+		return
+
+	if sell_button:
+		sell_button.visible = false
+	if toggle_button:
+		toggle_button.visible = false
+	if level_button:
+		level_button.visible = false
+	if count_label:
+		count_label.text = "Выбрать"
+		count_label.add_theme_color_override("font_color", "99E550")
+
+	mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	if not gui_input.is_connected(_on_gui_input):
+		gui_input.connect(_on_gui_input)
+
+func _on_gui_input(event: InputEvent) -> void:
+	if not select_mode:
+		return
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+		picked.emit(instance_uid, slime_id)
 
 # ============================================
 # ОБНОВЛЕНИЕ
@@ -85,6 +128,39 @@ func refresh():
 		sell_button.text = "Sell " + GameState.format_number(price)
 		sell_button.disabled = on_scene
 		sell_button.tooltip_text = "Сначала убери со сцены" if on_scene else ""
+
+	_refresh_level_button()
+
+# ============================================
+# УРОВЕНЬ
+# ============================================
+# Уровень свой у каждого слизня, поэтому кнопка стоит на карточке
+# конкретного экземпляра, а не в магазине у вида.
+func _refresh_level_button():
+	if level_button == null:
+		return
+
+	var level := GameState.get_instance_level(instance_uid)
+	if GameState.is_max_level(instance_uid):
+		level_button.text = "Ур.%d MAX" % level
+		level_button.disabled = true
+		level_button.tooltip_text = "Максимальный уровень"
+		return
+
+	# Без стрелки: символа ▲ нет в пиксельном шрифте, он рисуется
+	# квадратом и съедает ширину кнопки
+	var cost := GameState.get_level_price(instance_uid)
+	level_button.text = "Ур.%d  %s" % [level, GameState.format_number(cost)]
+	level_button.disabled = GameState.slime < cost
+	level_button.tooltip_text = (
+		"Не хватает слизи" if GameState.slime < cost
+		else "Капля станет дороже на %d%%" % int(slime_data.level_drop_bonus * 100.0)
+	)
+
+func _on_level_up():
+	if GameState.level_up_instance(instance_uid):
+		changed.emit()
+		refresh()
 
 # ============================================
 # ДЕЙСТВИЯ

@@ -1,0 +1,33 @@
+[gd_resource type="TileSet" format=3 uid="uid://dgn00k2xvpj43"]
+
+[ext_resource type="Texture2D" uid="uid://ch4ouihco0hw2" path="res://Sprites/race/TILESET.png" id="1_nnuro"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_dv611"]
+texture = ExtResource("1_nnuro")
+texture_region_size = Vector2i(32, 32)
+0:0/0 = 0
+0:1/0 = 0
+0:2/0 = 0
+0:3/0 = 0
+0:4/0 = 0
+1:0/0 = 0
+2:0/0 = 0
+3:0/0 = 0
+3:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-16, -16, 16, -16, 16, 16, -16, 16)
+4:0/size_in_atlas = Vector2i(2, 2)
+4:0/next_alternative_id = 2
+4:0/animation_columns = 6
+4:0/animation_speed = 10.0
+4:0/animation_frame_0/duration = 1.0
+4:0/animation_frame_1/duration = 1.0
+4:0/animation_frame_2/duration = 1.0
+4:0/animation_frame_3/duration = 1.0
+4:0/animation_frame_4/duration = 1.0
+4:0/animation_frame_5/duration = 1.0
+4:0/0 = 0
+
+[resource]
+tile_size = Vector2i(32, 32)
+physics_layer_0/collision_layer = 1
+physics_layer_0/collision_mask = 3
+sources/1 = SubResource("TileSetAtlasSource_dv611")

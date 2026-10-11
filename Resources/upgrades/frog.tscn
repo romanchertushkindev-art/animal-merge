@@ -222,10 +222,8 @@ shape = SubResource("CircleShape2D_mca0q")
 
 [node name="TongueLine" type="Line2D" parent="." unique_id=2085016833]
 z_index = 5
-position = Vector2(10, -1)
-points = PackedVector2Array(0, 0)
-width = 6.0
-default_color = Color(0.7061648, 0.39901146, 0.51233816, 1)
+width = 5.0
+default_color = Color(0.62, 0.239, 0.275, 1)
 antialiased = true
 
 [node name="Movement" type="Node" parent="." unique_id=2027519648]

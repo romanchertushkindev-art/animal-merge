@@ -34,7 +34,7 @@ func setup(slime_data: SlimeData):
 		icon.custom_minimum_size = Vector2(80, 80)
 		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		if data.sheet_texture:
-			icon.texture = data.sheet_texture
+			icon.texture = data.shop_texture
 
 	if name_label:
 		name_label.text = data.display_name
@@ -50,7 +50,10 @@ func refresh():
 
 	var unlocked := GameState.has_slime(data.id)
 	var on_scene := GameState.get_on_scene_count_of(data.id)
-	var cost := data.price if unlocked else data.unlock_price
+	# Цена считается по числу уже купленных копий вида: каждая
+	# следующая дороже. При фиксированной цене один удачный слизень
+	# выкупал весь магазин за пару минут.
+	var cost := data.get_copy_price(GameState.get_slime_count(data.id))
 
 	if count_label:
 		# Раньше здесь писалось «Куплено», но показывалось число слизней
@@ -91,7 +94,7 @@ func _on_buy_pressed():
 		return
 
 	var unlocked := GameState.has_slime(data.id)
-	var cost := data.price if unlocked else data.unlock_price
+	var cost := data.get_copy_price(GameState.get_slime_count(data.id))
 
 	if not GameState.spend_slime(cost):
 		return

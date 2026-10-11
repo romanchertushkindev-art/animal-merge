@@ -1,12 +1,16 @@
-[gd_resource type="Resource" load_steps=4 format=3]
+[gd_resource type="Resource" script_class="ShopSection" format=3 uid="uid://e0u77nbc8c6g"]
 
-[ext_resource type="Script" path="res://Scripts/ui/shop/shop_section.gd" id="1_script"]
-[ext_resource type="Texture2D" path="res://Sprites/upgrades/frog.png" id="2_icon"]
-[ext_resource type="PackedScene" path="res://Resources/ui/dialogs/shop/shop_tab_upgrades.tscn" id="3_scene"]
+[ext_resource type="Script" uid="uid://3cldqrvgt2c4" path="res://Scripts/ui/shop/shop_section.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://bju3vqtibrncg" path="res://Sprites/upgrades/frog.png" id="2_icon"]
+[ext_resource type="PackedScene" uid="uid://qh5onhj3lirr" path="res://Resources/ui/dialogs/shop/shop_tab_upgrades.tscn" id="3_scene"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_tab_icon"]
+atlas = ExtResource("2_icon")
+region = Rect2(0, 48, 48, 48)
 
 [resource]
 script = ExtResource("1_script")
 id = "upgrades"
 title = "Апгрейды"
-icon = ExtResource("2_icon")
+icon = SubResource("AtlasTexture_tab_icon")
 content_scene = ExtResource("3_scene")

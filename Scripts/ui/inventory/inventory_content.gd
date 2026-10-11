@@ -1,10 +1,18 @@
 extends ScrollContainer
 class_name InventoryContent
 
+# Вызывается, когда игрок выбрал слизня в режиме выбора (см. select_mode)
+signal slime_selected(instance_uid: int, slime_id: String)
+
 @onready var item_list: HFlowContainer = %ItemList
 
 const ITEM_SCENE := preload("res://Resources/ui/dialogs/inventory/inventory_item.tscn")
 const PIXEL_FONT := preload("res://Resources/fonts/pixelFont.ttf")
+
+# Режим выбора: у карточек прячутся кнопки Put/Sell, а клик по самой
+# карточке возвращает слизня. Так открывается выбор гонщика в гонке.
+# По умолчанию выключен — обычный инвентарь работает как раньше.
+@export var select_mode: bool = false
 
 func _ready():
 	if GameState:
@@ -41,6 +49,14 @@ func build():
 		return
 
 	for inst in instances:
-		var item = ITEM_SCENE.instantiate()
+		var item: InventoryItem = ITEM_SCENE.instantiate()
 		item_list.add_child(item)
-		item.setup(inst.id, inst.uid)   # ← передаём id И uid
+		item.setup(inst.id, inst.uid, select_mode)   # ← передаём id, uid и режим
+		if select_mode:
+			item.picked.connect(_on_item_picked)
+
+# ============================================
+# ВЫБОР
+# ============================================
+func _on_item_picked(instance_uid: int, slime_id: String) -> void:
+	slime_selected.emit(instance_uid, slime_id)
