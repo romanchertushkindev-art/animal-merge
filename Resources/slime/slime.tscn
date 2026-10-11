@@ -51,24 +51,20 @@ scale_over_velocity_max = 0.5
 color_ramp = SubResource("GradientTexture1D_rgh2o")
 
 [node name="Slime" type="Area2D" unique_id=1477249318]
-y_sort_enabled = true
 collision_mask = 3
 script = ExtResource("1_8sb4s")
 data = SubResource("Resource_rgh2o")
 fall_distance = 50.0
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=123532353]
-y_sort_enabled = true
 sprite_frames = ExtResource("6_mmjg0")
 animation = &"run_up"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1551535825]
-y_sort_enabled = true
 shape = SubResource("CircleShape2D_mca0q")
 
 [node name="SlimeTrail" type="GPUParticles2D" parent="." unique_id=1268058296]
 z_index = -1
-y_sort_enabled = true
 position = Vector2(0, 12)
 amount = 20
 lifetime = 2.0
@@ -77,7 +73,6 @@ process_material = SubResource("ParticleProcessMaterial_mca0q")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=261056173]
 z_index = -1
-y_sort_enabled = true
 position = Vector2(0, 12)
 texture = ExtResource("7_pgxm6")
 

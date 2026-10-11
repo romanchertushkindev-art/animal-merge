@@ -207,7 +207,6 @@ animations = [{
 radius = 22.000002
 
 [node name="Frog" type="StaticBody2D" unique_id=766724255]
-y_sort_enabled = true
 collision_layer = 2
 script = ExtResource("1_1shn4")
 swallow_duration = 1.0
