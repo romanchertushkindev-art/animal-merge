@@ -185,8 +185,8 @@ func _get_drop_value() -> float:
 # СТОЛКНОВЕНИЯ
 # ============================================
 func _on_area_entered(area: Area2D):
-	if not area.is_in_group(GROUP_NAME):
-		return
+	#if not area.is_in_group(GROUP_NAME):
+		#return
 	if current_state == State.GRABBED:
 		return
 	if turn_cooldown > 0:

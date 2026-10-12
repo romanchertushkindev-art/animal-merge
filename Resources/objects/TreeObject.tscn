@@ -6,23 +6,22 @@
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_rgh2o"]
 size = Vector2(16, 11.5)
 
-[node name="Tree" type="StaticBody2D" unique_id=118147615]
+[node name="Tree" type="Area2D" unique_id=1027106295]
 scale = Vector2(2, 2)
 collision_layer = 2
 collision_mask = 0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1110320770]
-position = Vector2(0, 3.75)
+position = Vector2(0, 9)
 shape = SubResource("RectangleShape2D_rgh2o")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1706259539]
-position = Vector2(0, 38.5)
+position = Vector2(0, 44)
 texture = ExtResource("1_tbwde")
 offset = Vector2(0, -53)
 hframes = 4
 
 [node name="Sprite2D2" type="Sprite2D" parent="." unique_id=166200555]
-z_index = -1
-position = Vector2(0.5, 6)
+position = Vector2(0.5, 11.5)
 scale = Vector2(0.93750006, 1)
 texture = ExtResource("2_r7lng")
