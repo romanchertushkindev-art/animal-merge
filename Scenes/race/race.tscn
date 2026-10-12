@@ -70,6 +70,7 @@ position = Vector2(335, 2)
 
 [node name="RacerSlime" parent="." unique_id=190882148 instance=ExtResource("6_ed64k")]
 position = Vector2(50, 200)
+lane_y = Array[float]([200.0, 275.0, 305.0])
 lane = 0
 
 [node name="Camera2D" type="Camera2D" parent="RacerSlime" unique_id=1585788004]

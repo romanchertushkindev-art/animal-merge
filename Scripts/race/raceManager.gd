@@ -24,8 +24,6 @@ const RESULT_CONTENT := preload("res://Scenes/race/race_result.tscn")
 # ТРАССА
 # ============================================
 @export_group("Трасса")
-@export var lane_y: Array[float] = [245.0, 275.0, 305.0]
-@export var start_x: float = 100.0          # откуда стартует слизень
 @export var pixels_per_meter: float = 40.0  # перевод пикселей в метры
 
 # ============================================
@@ -62,6 +60,7 @@ var _selected_uid: int = -1
 var _selected_slime_id: String = ""
 var _running: bool = false
 var _finish_x: float = 0.0
+var _start_x: float = 0.0             # X, с которого начался заезд (берём у слизня)
 var _selection_dialog: Dialog = null
 var _result_dialog: Dialog = null
 
@@ -78,9 +77,10 @@ func _ready() -> void:
 
 ## Раздаёт препятствиям полосы, чтобы они встали ровно на свою дорожку
 func _setup_obstacles() -> void:
+	# Полосы берём у слизня: он задан в сцене и это единственный источник
 	for child in obstacles_root.get_children():
 		if child is Obstacle:
-			(child as Obstacle).setup(lane_y)
+			(child as Obstacle).setup(slime.lane_y)
 
 # ============================================
 # ВЫБОР ГОНЩИКА ИЗ ИНВЕНТАРЯ
@@ -124,8 +124,8 @@ func _start_run(slime_id: String, uid: int) -> void:
 	_selected_uid = uid
 
 	slime.apply_slime(slime_id, uid)
-	slime.lane_y = lane_y
-	slime.global_position = Vector2(start_x, lane_y[clampi(slime.lane, 0, lane_y.size() - 1)])
+	# Позиция и полосы уже заданы в сцене на узле RacerSlime — не трогаем
+	_start_x = slime.position.x
 	slime.speed = base_speed + slime.race_stat("race_speed") * speed_per_stat
 
 	_running = true
@@ -225,7 +225,7 @@ func _end_run(reason: String) -> void:
 # НАГРАДА
 # ============================================
 func _distance_px() -> float:
-	return maxf(slime.global_position.x - start_x, 0.0)
+	return maxf(slime.global_position.x - _start_x, 0.0)
 
 func _distance_m() -> float:
 	return _distance_px() / maxf(pixels_per_meter, 1.0)

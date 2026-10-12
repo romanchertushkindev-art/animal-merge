@@ -16,7 +16,7 @@ signal finished()
 # ПАРАМЕТРЫ
 # ============================================
 @export var speed: float = 190.0            # px/с вправо (менеджер пересчитывает)
-@export var lane_y: Array[float] = [245.0, 275.0, 305.0]
+@export var lane_y: Array[float] = [200.0, 275.0, 305.0]
 @export var lane: int = 1                   # текущая полоса 0..2
 @export var lane_speed: float = 300.0       # px/с смены полосы
 @export var jump_velocity: float = 400.0    # px/с вверх
