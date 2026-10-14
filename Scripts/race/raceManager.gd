@@ -11,6 +11,7 @@ const DIALOG_SCENE := preload("res://Resources/ui/dialogs/dialog_base.tscn")
 const INVENTORY_CONTENT := preload("res://Resources/ui/dialogs/inventory/inventory_content.tscn")
 const RESULT_CONTENT := preload("res://Scenes/race/race_result.tscn")
 const RACER_SCENE := preload("res://Scenes/race/racer_slime.tscn")
+const PIXEL_FONT := preload("res://Resources/fonts/pixelFont.ttf")
 
 # ============================================
 # ТРАССА
@@ -55,13 +56,34 @@ var _finish_x: float = 0.0
 var _start_x: float = 0.0
 var _selection_dialog: Dialog = null
 var _result_dialog: Dialog = null
+var _bots: Array[RacerSlime] = []
+var _countdown: float = 0.0      # секунды до старта (3, 2, 1)
+var _go_timer: float = 0.0       # сколько ещё показывать «GO!»
+var _countdown_label: Label = null
 
 # ============================================
 # ИНИЦИАЛИЗАЦИЯ
 # ============================================
 func _ready() -> void:
 	_finish_x = finish_layer.global_position.x if finish_layer else 100000.0
+	_setup_countdown()
 	_open_selection()
+
+## Лейбл отсчёта «3, 2, 1, GO!» поверх мира.
+func _setup_countdown() -> void:
+	var canvas := CanvasLayer.new()
+	add_child(canvas)
+	_countdown_label = Label.new()
+	_countdown_label.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_countdown_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_countdown_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_countdown_label.add_theme_font_override("font", PIXEL_FONT)
+	_countdown_label.add_theme_font_size_override("font_size", 48)
+	_countdown_label.add_theme_color_override("font_color", Color(1, 1, 1))
+	_countdown_label.add_theme_color_override("font_outline_color", Color(0.05, 0.06, 0.1))
+	_countdown_label.add_theme_constant_override("outline_size", 4)
+	_countdown_label.text = ""
+	canvas.add_child(_countdown_label)
 
 # ============================================
 # ВЫБОР ГОНЩИКА
@@ -104,30 +126,60 @@ func _start_run(slime_id: String, uid: int) -> void:
 	slime.speed = base_speed + slime.race_stat("race_speed") * speed_per_stat
 
 	_running = true
-	slime.start()
+	_countdown = 3.0
+	_go_timer = 0.0
 	_spawn_bots()
 	print("[Race] Заезд: %s (uid %d), скорость %d px/с" % [slime_id, uid, roundi(slime.speed)])
 
 ## Спавнит ботов-слаймов: те же бегуны, но с is_bot = true.
-## Едут рядом со своей скоростью, сами меняют полосы, ни с чем не сталкиваются.
+## Стоят на той же линии (X), что и игрок, но строго на других полосах.
 func _spawn_bots() -> void:
+	# Свободные полосы — все, кроме полосы игрока
+	var lanes: Array[int] = []
+	for i in slime.lane_y.size():
+		if i != slime.lane:
+			lanes.append(i)
+	if lanes.is_empty():
+		return
+
 	for i in bot_count:
 		var bot: RacerSlime = RACER_SCENE.instantiate()
 		bot.is_bot = true
 		bot.slime_id = "blue" if i % 2 == 0 else "green"
 		bot.lane_y = slime.lane_y
-		bot.lane = randi() % slime.lane_y.size()
+		bot.lane = lanes[i % lanes.size()]
 		bot.speed = slime.speed * randf_range(0.85, 1.1)
+		bot.obstacles_layer = obstacles_layer
 		add_child(bot)
-		bot.position.x = slime.position.x - randf_range(60.0, 300.0)
-		bot.start()
+		bot.position.x = slime.position.x
+		_bots.append(bot)
 
 # ============================================
 # ГЛАВНЫЙ ЦИКЛ
 # ============================================
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
 	if not _running:
 		return
+
+	# Отсчёт 3, 2, 1 — слизень и боты стоят
+	if _countdown > 0.0:
+		_countdown -= delta
+		if _countdown <= 0.0:
+			_countdown = 0.0
+			_countdown_label.text = "GO!"
+			slime.start()
+			for bot in _bots:
+				bot.start()
+			_go_timer = 0.6
+		else:
+			_countdown_label.text = str(ceili(_countdown))
+		return
+
+	# Прячем «GO!» через мгновение
+	if _go_timer > 0.0:
+		_go_timer -= delta
+		if _go_timer <= 0.0:
+			_countdown_label.text = ""
 
 	_check_hits()
 

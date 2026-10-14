@@ -45,6 +45,7 @@ var _alive: bool = false
 var _vy: float = 0.0          # вертикальная скорость (только в прыжке)
 var _grounded: bool = true
 var _bot_timer: float = 0.0   # таймер бота до следующей попытки сменить полосу
+var obstacles_layer: TileMapLayer = null   # ставит менеджер, чтобы бот видел препятствия
 
 # ============================================
 # СОСТОЯНИЕ (публичный доступ)
@@ -88,13 +89,31 @@ func _physics_process(delta: float) -> void:
 			_grounded = true
 			_update_collision()
 
-	# Бот сам выбирает полосу
+	# Бот: перепрыгивает препятствие впереди, иначе сам меняет полосу
 	if is_bot:
+		if _grounded and _obstacle_ahead():
+			jump()
 		_bot_timer -= delta
 		if _bot_timer <= 0.0:
 			_bot_timer = bot_switch_interval
 			if randf() < bot_switch_chance:
 				switch_lane(-1 if randf() < 0.5 else 1)
+
+## Есть ли препятствие на полосе бота чуть впереди.
+func _obstacle_ahead() -> bool:
+	if obstacles_layer == null:
+		return false
+	for cell in obstacles_layer.get_used_cells():
+		var data := obstacles_layer.get_cell_tile_data(cell)
+		if data == null:
+			continue
+		var lane_v: Variant = data.get_custom_data("lane")
+		if lane_v == null or int(lane_v) != lane:
+			continue
+		var center := obstacles_layer.to_global(obstacles_layer.map_to_local(cell))
+		if center.x > global_position.x and center.x < global_position.x + 140.0:
+			return true
+	return false
 
 # ============================================
 # УПРАВЛЕНИЕ
