@@ -2,56 +2,48 @@ class_name RaceManager
 extends Node2D
 
 # Гонка-раннер на три полосы.
-#
-# Уровень собран из TileMapLayer (Ground + Finish + Decor), слизень едет
-# слева направо и переключает полосы, препятствия расставлены вручную.
-# В начале заезда игрок выбирает слизня из инвентаря: его race_speed
-# задаёт скорость, а остальные статы решают, пройдёт ли он тяжёлое
-# препятствие. За дистанцию платят слизем — сумма считается от текущего
-# дохода ферма, чтобы гонка была одинаково выгодна на любом этапе.
-#
-# Масштабируемость:
-#   - новое препятствие = сцена на базе Obstacle (текстура/полоса/стат в
-#     инспекторе, особая логика — переопределённый resolve/on_hit/_process);
-#   - новая полоса = добавить Y в lane_y и расширить TileMapLayer;
-#   - новый слизень = просто выбран в инвентаре, данные уже в SlimeData.
+# Препятствия — тайлы в TileMapLayer "Obstacles". У каждого тайла
+# в Custom Data Layer "lane" записан номер полосы (0/1/2).
+# Коллизия засчитывается только если полоса препятствия == полоса слизня.
+# Любая коллизия = конец заезда.
 
 const DIALOG_SCENE := preload("res://Resources/ui/dialogs/dialog_base.tscn")
 const INVENTORY_CONTENT := preload("res://Resources/ui/dialogs/inventory/inventory_content.tscn")
 const RESULT_CONTENT := preload("res://Scenes/race/race_result.tscn")
+const RACER_SCENE := preload("res://Scenes/race/racer_slime.tscn")
 
 # ============================================
 # ТРАССА
 # ============================================
 @export_group("Трасса")
-@export var pixels_per_meter: float = 40.0  # перевод пикселей в метры
+@export var pixels_per_meter: float = 40.0
 
 # ============================================
 # СЛИЗЕНЬ
 # ============================================
 @export_group("Слизень")
 @export var default_slime_id: String = "green"
-@export var base_speed: float = 130.0       # px/с при race_speed = 0
-@export var speed_per_stat: float = 6.0     # прибавка за единицу race_speed
+@export var base_speed: float = 130.0
+@export var speed_per_stat: float = 6.0
 
 # ============================================
 # НАГРАДА
 # ============================================
-# Фиксированная сумма здесь не годится: 3600 слизи — копейки на десятой
-# минуте и ничто на третьем часе. Привязка к доходу ферма держит гонку
-# на одной и той же выгоде на любом этапе. Проверено симуляцией.
 @export_group("Награда")
 @export var reward_seconds_per_meter: float = 0.28
+
+# ============================================
+# БОТЫ
+# ============================================
+@export_group("Боты")
+@export var bot_count: int = 3              # сколько ботов-слаймов едут рядом
 
 # ============================================
 # ССЫЛКИ
 # ============================================
 @onready var slime: RacerSlime = $RacerSlime
-@onready var obstacles_root: Node2D = $Obstacles
-@onready var finish_layer: TileMapLayer = $Background/Ground/Finish
-@onready var sky: Sprite2D = $Background/Sky
-@onready var mountains_far: Sprite2D = $Background/MountainsFar
-@onready var mountains: Sprite2D = $Background/Mountains
+@onready var obstacles_layer: TileMapLayer = $TileMap/Obstacles
+@onready var finish_layer: TileMapLayer = $TileMap/Finish
 
 # ============================================
 # СОСТОЯНИЕ
@@ -60,7 +52,7 @@ var _selected_uid: int = -1
 var _selected_slime_id: String = ""
 var _running: bool = false
 var _finish_x: float = 0.0
-var _start_x: float = 0.0             # X, с которого начался заезд (берём у слизня)
+var _start_x: float = 0.0
 var _selection_dialog: Dialog = null
 var _result_dialog: Dialog = null
 
@@ -68,25 +60,13 @@ var _result_dialog: Dialog = null
 # ИНИЦИАЛИЗАЦИЯ
 # ============================================
 func _ready() -> void:
-	# Финиш — левый край шахматных тайлов Finish. Берём из сцены, чтобы
-	# не хардкодить X в двух местах.
 	_finish_x = finish_layer.global_position.x if finish_layer else 100000.0
-
-	_setup_obstacles()
 	_open_selection()
 
-## Раздаёт препятствиям полосы, чтобы они встали ровно на свою дорожку
-func _setup_obstacles() -> void:
-	# Полосы берём у слизня: он задан в сцене и это единственный источник
-	for child in obstacles_root.get_children():
-		if child is Obstacle:
-			(child as Obstacle).setup(slime.lane_y)
-
 # ============================================
-# ВЫБОР ГОНЩИКА ИЗ ИНВЕНТАРЯ
+# ВЫБОР ГОНЩИКА
 # ============================================
 func _open_selection() -> void:
-	# Пустой инвентарь: нечего выбирать, едем на дефолтном слизне
 	if GameState.get_all_instances().is_empty():
 		_start_run(default_slime_id, -1)
 		return
@@ -105,33 +85,42 @@ func _open_selection() -> void:
 
 func _on_slime_selected(instance_uid: int, slime_id: String) -> void:
 	_start_run(slime_id, instance_uid)
-	# Старт первым: close() шлёт closed, и закрытие без выбора уже увидит,
-	# что _running = true, и не станет подменять выбранного слизня.
 	if _selection_dialog and is_instance_valid(_selection_dialog):
 		_selection_dialog.close()
 
 func _on_selection_closed() -> void:
-	# Диалог закрыли, так и не выбрав: едем на дефолтном, чтобы заезд
-	# не завис в ожидании выбора.
 	if not _running:
 		_start_run(default_slime_id, -1)
 
 # ============================================
-# СТАРТ ЗАЕЗДА
+# СТАРТ
 # ============================================
 func _start_run(slime_id: String, uid: int) -> void:
 	_selected_slime_id = slime_id
 	_selected_uid = uid
 
 	slime.apply_slime(slime_id, uid)
-	# Позиция и полосы уже заданы в сцене на узле RacerSlime — не трогаем
 	_start_x = slime.position.x
 	slime.speed = base_speed + slime.race_stat("race_speed") * speed_per_stat
 
 	_running = true
 	slime.start()
-
+	_spawn_bots()
 	print("[Race] Заезд: %s (uid %d), скорость %d px/с" % [slime_id, uid, roundi(slime.speed)])
+
+## Спавнит ботов-слаймов: те же бегуны, но с is_bot = true.
+## Едут рядом со своей скоростью, сами меняют полосы, ни с чем не сталкиваются.
+func _spawn_bots() -> void:
+	for i in bot_count:
+		var bot: RacerSlime = RACER_SCENE.instantiate()
+		bot.is_bot = true
+		bot.slime_id = "blue" if i % 2 == 0 else "green"
+		bot.lane_y = slime.lane_y
+		bot.lane = randi() % slime.lane_y.size()
+		bot.speed = slime.speed * randf_range(0.85, 1.1)
+		add_child(bot)
+		bot.position.x = slime.position.x - randf_range(60.0, 300.0)
+		bot.start()
 
 # ============================================
 # ГЛАВНЫЙ ЦИКЛ
@@ -144,51 +133,49 @@ func _process(_delta: float) -> void:
 
 	if slime.global_position.x >= _finish_x:
 		_finish_run()
-		
-## Ручная проверка прямоугольников вместо Area2D: порядок сигналов не
-## важен, результат предсказуем, а полоса проверяется явно.
+
+## Проверяем пересечение тела слизня с клетками TileMapLayer.
+## Коллизия засчитывается только если полоса тайла == полоса слизня.
 func _check_hits() -> void:
-	var body := slime.get_body_rect()
-	for child in obstacles_root.get_children():
-		if not (child is Obstacle):
-			continue
-		var obstacle := child as Obstacle
-		if not obstacle.blocks_lane(slime.lane):
-			continue
-		if body.intersects(obstacle.get_rect()):
-			_on_obstacle_hit(obstacle)
-			return
-
-func _on_obstacle_hit(obstacle: Obstacle) -> void:
-	var survived := obstacle.resolve(slime)
-	obstacle.on_hit(slime)
-
-	if survived:
-		# Выдержал: препятствие ломается, бегун едет дальше
-		obstacle.queue_free()
-		slime.flash()
+	if obstacles_layer == null:
+		return
+	if not slime.is_grounded():
 		return
 
-	_end_run(_death_reason(obstacle))
+	var body := slime.get_body_rect()
 
-func _death_reason(obstacle: Obstacle) -> String:
-	if obstacle.required_stat == "":
-		return obstacle.title
-	return "%s: %s %d, нужно %d" % [
-		obstacle.title,
-		_stat_title(obstacle.required_stat),
-		roundi(slime.race_stat(obstacle.required_stat)),
-		roundi(obstacle.required_value),
-	]
+	# Мировые координаты -> локальные тайлмапа -> клетки
+	var tl_local := obstacles_layer.to_local(body.position)
+	var br_local := obstacles_layer.to_local(body.end)
 
-func _stat_title(stat: String) -> String:
-	match stat:
-		"race_speed": return "Скорость"
-		"race_stamina": return "Выносливость"
-		"race_grip": return "Сцепление"
-		"race_weight": return "Сила"
-		"race_luck": return "Удача"
-	return stat
+	var tl_map := obstacles_layer.local_to_map(tl_local)
+	var br_map := obstacles_layer.local_to_map(br_local)
+
+	# Перебираем все клетки, которые накрывает тело
+	for x in range(tl_map.x, br_map.x + 1):
+		for y in range(tl_map.y, br_map.y + 1):
+			var coords := Vector2i(x, y)
+			var data := obstacles_layer.get_cell_tile_data(coords)
+			if data == null:
+				continue
+
+			# Полоса препятствия из Custom Data Layer "lane"
+			var lane_v: Variant = data.get_custom_data("lane")
+			var tile_lane: int = int(lane_v) if lane_v != null else -1
+			if tile_lane == -1:
+				continue  # тайл не препятствие (или слой не задан)
+			if tile_lane != slime.lane:
+				continue  # препятствие на другой полосе
+
+			_on_tile_hit(coords, data)
+			return  # одно препятствие за кадр
+
+func _on_tile_hit(_coords: Vector2i, data: TileData) -> void:
+	# Название препятствия — из Custom Data Layer "title".
+	var title_v: Variant = data.get_custom_data("title")
+	var title: String = str(title_v) if title_v != null and str(title_v) != "" else "Препятствие"
+
+	_end_run(title)
 
 # ============================================
 # КОНЕЦ ЗАЕЗДА
@@ -258,8 +245,8 @@ func _clear_result_dialog() -> void:
 
 func _on_retry() -> void:
 	_clear_result_dialog()
-	get_tree().reload_current_scene()
+	SceneTransition.change_scene("res://Scenes/race/race.tscn", 1)
 
 func _on_quit() -> void:
 	_clear_result_dialog()
-	get_tree().change_scene_to_file("res://Scenes/main.tscn")
+	SceneTransition.change_scene("res://Scenes/main.tscn", 1)

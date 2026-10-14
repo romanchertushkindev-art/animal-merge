@@ -1,9 +1,11 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://bf8pcq1qen7fy"]
 
-[ext_resource type="Script" path="res://Scripts/race/obstacle.gd" id="1_obstacle"]
+[ext_resource type="Script" uid="uid://l4v5ivxky58p" path="res://Scripts/race/obstacle.gd" id="1_obstacle"]
+[ext_resource type="Texture2D" uid="uid://s2nspubexegj" path="res://Sprites/race/obstacles/rock.png" id="2_tdw3g"]
 
-[node name="Obstacle" type="Node2D"]
+[node name="Obstacle" type="Node2D" unique_id=1723596330]
 script = ExtResource("1_obstacle")
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=174187888]
+texture = ExtResource("2_tdw3g")
 centered = false

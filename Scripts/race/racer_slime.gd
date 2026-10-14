@@ -24,10 +24,18 @@ signal finished()
 @export var slime_id: String = "green"
 
 # ============================================
+# БОТ
+# ============================================
+@export var is_bot: bool = false              # бот едет сам и сам меняет полосы
+@export var bot_switch_interval: float = 1.2  # раз в сколько секунд бот думает о смене
+@export var bot_switch_chance: float = 0.5    # шанс сменить полосу
+
+# ============================================
 # ССЫЛКИ
 # ============================================
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D
 @onready var collision_shape: CollisionShape2D = $CollisionShape2D
+@onready var effects: AnimatedSprite2D = $Effects
 
 # ============================================
 # СОСТОЯНИЕ
@@ -36,7 +44,20 @@ var _uid: int = -1
 var _alive: bool = false
 var _vy: float = 0.0          # вертикальная скорость (только в прыжке)
 var _grounded: bool = true
+var _bot_timer: float = 0.0   # таймер бота до следующей попытки сменить полосу
 
+# ============================================
+# СОСТОЯНИЕ (публичный доступ)
+# ============================================
+func is_grounded() -> bool:
+	return _grounded
+
+## Включает/выключает коллизию в зависимости от состояния.
+## Вызывается при старте, прыжке и приземлении.
+func _update_collision() -> void:
+	if collision_shape:
+		collision_shape.disabled = not _grounded
+		
 # ============================================
 # ИНИЦИАЛИЗАЦИЯ
 # ============================================
@@ -65,12 +86,21 @@ func _physics_process(delta: float) -> void:
 			position.y = lane_y[lane]
 			_vy = 0.0
 			_grounded = true
+			_update_collision()
+
+	# Бот сам выбирает полосу
+	if is_bot:
+		_bot_timer -= delta
+		if _bot_timer <= 0.0:
+			_bot_timer = bot_switch_interval
+			if randf() < bot_switch_chance:
+				switch_lane(-1 if randf() < 0.5 else 1)
 
 # ============================================
 # УПРАВЛЕНИЕ
 # ============================================
 func _unhandled_input(event: InputEvent) -> void:
-	if not _alive:
+	if is_bot or not _alive:
 		return
 
 	if event.is_action_pressed("ui_up"):
@@ -83,13 +113,37 @@ func _unhandled_input(event: InputEvent) -> void:
 		jump()
 
 func switch_lane(dir: int) -> void:
+	if _grounded == false:
+		return
+		 
+	playDash(dir)
 	lane = clampi(lane + dir, 0, lane_y.size() - 1)
 
+func playDash(dir: int) -> void: 
+	if lane == 0 and dir == -1 or lane == 2 and dir == 1:
+		return
+		
+	if dir == 1:
+		effects.rotation_degrees = -90
+		effects.position = Vector2(0, -25)
+	else:
+		effects.rotation_degrees = 90
+		effects.position = Vector2(0, 25)
+		
+	effects.play("dash")
+	
+func playJump() -> void:
+	effects.rotation_degrees = 0
+	effects.position = Vector2(0, 25)
+	effects.play("jump")
+	
 func jump() -> void:
 	if not _grounded:
 		return
+	playJump()
 	_grounded = false
 	_vy = -jump_velocity
+	_update_collision()
 
 # ============================================
 # ЖИЗНЕННЫЙ ЦИКЛ
@@ -99,6 +153,7 @@ func start() -> void:
 	_grounded = true
 	_vy = 0.0
 	position.y = lane_y[lane]
+	_update_collision()     
 	if sprite and sprite.sprite_frames and sprite.sprite_frames.has_animation("run_right"):
 		sprite.play("run_right")
 

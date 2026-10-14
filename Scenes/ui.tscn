@@ -10,7 +10,8 @@
 [ext_resource type="FontFile" uid="uid://mgslytvy8x0r" path="res://Resources/fonts/pixelFont.ttf" id="7_whq80"]
 [ext_resource type="Texture2D" uid="uid://pkmatkiuckvt" path="res://Sprites/slimeDrops/green_drop.png" id="8_kuui0"]
 [ext_resource type="Script" uid="uid://us52mip31552" path="res://Scripts/ui/reset_state[btn].gd" id="9_mmixe"]
-[ext_resource type="Script" path="res://Scripts/ui/click_multiplier.gd" id="10_mul"]
+[ext_resource type="Script" uid="uid://dxilvrs6jl0rm" path="res://Scripts/ui/click_multiplier.gd" id="10_mul"]
+[ext_resource type="Script" uid="uid://c8koxfvuxia1i" path="res://Scripts/ui/to_race[btn].gd" id="11_4vbiv"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_mca0q"]
 texture = ExtResource("5_3r70p")
@@ -163,7 +164,7 @@ theme_override_font_sizes/font_size = 15
 text = "0"
 horizontal_alignment = 1
 
-[node name="MultiplierPanel" type="Panel" parent="Header/VBoxContainer/HBoxContainer/MarginContainer/HBoxContainer"]
+[node name="MultiplierPanel" type="Panel" parent="Header/VBoxContainer/HBoxContainer/MarginContainer/HBoxContainer" unique_id=523991230]
 visible = false
 custom_minimum_size = Vector2(118, 48)
 custom_maximum_size = Vector2(118, 48)
@@ -173,7 +174,7 @@ size_flags_vertical = 0
 theme_override_styles/panel = SubResource("StyleBoxTexture_mca0q")
 script = ExtResource("10_mul")
 
-[node name="ClickMultiplier" type="VBoxContainer" parent="Header/VBoxContainer/HBoxContainer/MarginContainer/HBoxContainer/MultiplierPanel"]
+[node name="ClickMultiplier" type="VBoxContainer" parent="Header/VBoxContainer/HBoxContainer/MarginContainer/HBoxContainer/MultiplierPanel" unique_id=725408196]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -183,7 +184,7 @@ grow_vertical = 2
 theme_override_constants/separation = 0
 alignment = 1
 
-[node name="MultiplierLabel" type="Label" parent="Header/VBoxContainer/HBoxContainer/MarginContainer/HBoxContainer/MultiplierPanel/ClickMultiplier"]
+[node name="MultiplierLabel" type="Label" parent="Header/VBoxContainer/HBoxContainer/MarginContainer/HBoxContainer/MultiplierPanel/ClickMultiplier" unique_id=581192695]
 unique_name_in_owner = true
 texture_filter = 1
 layout_mode = 2
@@ -194,7 +195,7 @@ text = "×1.0"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="TimerLabel" type="Label" parent="Header/VBoxContainer/HBoxContainer/MarginContainer/HBoxContainer/MultiplierPanel/ClickMultiplier"]
+[node name="TimerLabel" type="Label" parent="Header/VBoxContainer/HBoxContainer/MarginContainer/HBoxContainer/MultiplierPanel/ClickMultiplier" unique_id=1206358875]
 unique_name_in_owner = true
 texture_filter = 1
 layout_mode = 2
@@ -207,6 +208,20 @@ horizontal_alignment = 1
 
 [node name="HBoxContainer2" type="HBoxContainer" parent="Header/VBoxContainer" unique_id=1292348022]
 layout_mode = 2
+
+[node name="MarginContainer2" type="MarginContainer" parent="Header/VBoxContainer/HBoxContainer2" unique_id=1662715096]
+layout_mode = 2
+size_flags_horizontal = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="To Race Btn" type="Button" parent="Header/VBoxContainer/HBoxContainer2/MarginContainer2" unique_id=1678839766]
+layout_mode = 2
+size_flags_horizontal = 10
+text = "TO RACE"
+script = ExtResource("11_4vbiv")
 
 [node name="MarginContainer" type="MarginContainer" parent="Header/VBoxContainer/HBoxContainer2" unique_id=834845961]
 layout_mode = 2
