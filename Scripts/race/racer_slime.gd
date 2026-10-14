@@ -63,9 +63,12 @@ func is_dashing() -> bool:
 func get_dash_from_lane() -> int:
 	return _dash_from_lane
 
-## Оглушение: слизень ненадолго перестаёт ехать вперёд.
+## Оглушение: слизень ненадолго перестаёт ехать вперёд и показывает звёзды.
 func bump() -> void:
 	_stun_timer = 0.5
+	if overhead_pointer:
+		overhead_pointer.visible = true
+		overhead_pointer.play("bump")
 
 ## Плавно вернуться на полосу (после неудачного деша в другого слизня).
 func return_to_lane(target: int) -> void:
@@ -96,6 +99,13 @@ func _physics_process(delta: float) -> void:
 	# Горизонталь: едем вправо (оглушён — стоим на месте)
 	if _stun_timer > 0.0:
 		_stun_timer -= delta
+		if _stun_timer <= 0.0:
+			# Оглушение кончилось: игроку возвращаем указатель, боту прячем
+			if overhead_pointer:
+				if is_bot:
+					overhead_pointer.visible = false
+				else:
+					overhead_pointer.play("pointer")
 	else:
 		position.x += speed * delta
 
@@ -238,9 +248,9 @@ func apply_slime(id: String, uid: int) -> void:
 		sprite.sprite_frames = SlimeBase._get_frames_for(sprite.sprite_frames, data.sheet_texture)
 	if sprite and sprite.sprite_frames and sprite.sprite_frames.has_animation("run_right"):
 		sprite.play("run_right")
-		
+	
 	overhead_pointer.visible = !is_bot
-
+	
 func race_stat(stat: String) -> float:
 	if _uid >= 0:
 		var value := GameState.get_instance_race_stat(_uid, stat)

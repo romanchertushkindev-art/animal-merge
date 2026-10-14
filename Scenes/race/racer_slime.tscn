@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://bbynfdcb2ob74" path="res://Sprites/race/effects/dash.png" id="4_vk2b8"]
 [ext_resource type="Texture2D" uid="uid://7s0g6535v6nq" path="res://Sprites/race/effects/jump.png" id="5_vk2b8"]
 [ext_resource type="Texture2D" uid="uid://87xvamcjxhyv" path="res://Sprites/race/pointers/ovehead_pointer.png" id="6_hurmf"]
+[ext_resource type="Texture2D" uid="uid://d14yop2gkafuc" path="res://Sprites/race/pointers/stun_pointer.png" id="7_5andg"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_body"]
 size = Vector2(28, 28)
@@ -141,6 +142,22 @@ animations = [{
 "speed": 30.0
 }]
 
+[sub_resource type="AtlasTexture" id="AtlasTexture_tkvqt"]
+atlas = ExtResource("7_5andg")
+region = Rect2(96, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_w7den"]
+atlas = ExtResource("7_5andg")
+region = Rect2(64, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_fnsqy"]
+atlas = ExtResource("7_5andg")
+region = Rect2(32, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_oxnm8"]
+atlas = ExtResource("7_5andg")
+region = Rect2(0, 0, 32, 32)
+
 [sub_resource type="AtlasTexture" id="AtlasTexture_qspja"]
 atlas = ExtResource("6_hurmf")
 region = Rect2(0, 0, 32, 32)
@@ -181,6 +198,23 @@ region = Rect2(256, 0, 32, 32)
 animations = [{
 "frames": [{
 "duration": 1.0,
+"texture": SubResource("AtlasTexture_tkvqt")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_w7den")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_fnsqy")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_oxnm8")
+}],
+"loop": 1,
+"name": &"bump",
+"speed": 8.0
+}, {
+"frames": [{
+"duration": 1.0,
 "texture": SubResource("AtlasTexture_qspja")
 }, {
 "duration": 1.0,
@@ -208,7 +242,7 @@ animations = [{
 "texture": SubResource("AtlasTexture_dsvho")
 }],
 "loop": 1,
-"name": &"default",
+"name": &"pointer",
 "speed": 10.0
 }]
 
@@ -236,7 +270,8 @@ sprite_frames = SubResource("SpriteFrames_mca0q")
 animation = &"jump"
 
 [node name="OverheadPointer" type="AnimatedSprite2D" parent="." unique_id=698895236]
-position = Vector2(0, -36)
+position = Vector2(0, -34)
 sprite_frames = SubResource("SpriteFrames_v2o47")
-autoplay = "default"
-frame_progress = 0.05043355
+animation = &"bump"
+autoplay = "pointer"
+frame_progress = 0.25943407
