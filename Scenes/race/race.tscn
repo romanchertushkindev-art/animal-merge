@@ -8,10 +8,44 @@
 [ext_resource type="Texture2D" uid="uid://dxsiusux47bfh" path="res://Sprites/race/bg/1.png" id="5_tv1b7"]
 [ext_resource type="PackedScene" uid="uid://c5bpxxvrglaas" path="res://Scenes/race/racer_slime.tscn" id="6_ed64k"]
 
+[sub_resource type="GDScript" id="GDScript_ed64k"]
+script/source = "extends Camera2D
+
+# Ссылка на игрока. Замените CharacterBody2D на класс вашего игрока, если нужно.
+@export var player: CharacterBody2D 
+
+# Задаем фиксированную высоту, на которой камера должна стоять
+@export var fixed_y_position: float = 300.0 
+
+# Скорость плавного догона камеры
+@export var smoothing_speed: float = 5.0
+
+@export var min_x: int = 0      # Левый предел в пикселях
+@export var max_x: int = 2000   # Правый предел в пикселях
+
+func _ready() -> void:
+	# Устанавливаем встроенные лимиты камеры
+	limit_left = min_x
+	limit_right = max_x
+	
+	if player:
+		global_position.y = fixed_y_position
+		global_position.x = player.global_position.x
+
+func _process(delta: float) -> void:
+	if player:
+		# Целевая позиция: X берем от игрока, а Y оставляем фиксированным
+		var target_position = Vector2(player.global_position.x, fixed_y_position)
+		
+		# Плавно двигаем камеру только к новой координате X
+		global_position = global_position.lerp(target_position, smoothing_speed * delta)
+"
+
 [node name="Race" type="Node2D" unique_id=1666420476]
 y_sort_enabled = true
 script = ExtResource("1_ed64k")
 default_slime_id = "blue"
+bot_count = 2
 
 [node name="TileMap" type="Node2D" parent="." unique_id=684147599]
 
@@ -48,7 +82,7 @@ scroll_scale = Vector2(0.3, 0.3)
 repeat_size = Vector2(640, 0)
 
 [node name="Sprite2D" type="Sprite2D" parent="Paralax BG/4" unique_id=671594790]
-position = Vector2(0, 16)
+position = Vector2(0, 64)
 texture = ExtResource("2_xfi84")
 
 [node name="3" type="Parallax2D" parent="Paralax BG" unique_id=1971340661]
@@ -79,10 +113,20 @@ position = Vector2(55, 257)
 lane_y = Array[float]([200.0, 230.0, 257.0])
 lane = 0
 
-[node name="Camera2D" type="Camera2D" parent="RacerSlime" unique_id=1585788004]
-position = Vector2(-53, -240)
-offset = Vector2(0, -50)
+[node name="Camera2D" type="Camera2D" parent="RacerSlime" unique_id=1585788004 node_paths=PackedStringArray("player")]
+position = Vector2(-54, -266)
 anchor_mode = 0
 ignore_rotation = false
-limit_right = 4012
+limit_left = 0
+limit_top = 0
+limit_right = 640
+limit_bottom = 360
 position_smoothing_enabled = true
+drag_left_margin = 1.0
+drag_top_margin = 1.0
+drag_right_margin = 1.0
+drag_bottom_margin = 1.0
+editor_draw_drag_margin = true
+script = SubResource("GDScript_ed64k")
+player = NodePath("..")
+max_x = 4012

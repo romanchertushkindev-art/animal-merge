@@ -182,6 +182,7 @@ func _process(delta: float) -> void:
 			_countdown_label.text = ""
 
 	_check_hits()
+	_check_slime_collisions()
 
 	if slime.global_position.x >= _finish_x:
 		_finish_run()
@@ -228,6 +229,25 @@ func _on_tile_hit(_coords: Vector2i, data: TileData) -> void:
 	var title: String = str(title_v) if title_v != null and str(title_v) != "" else "Препятствие"
 
 	_end_run(title)
+
+## Столкновение слизней при деше: дешнувший врезается в другого —
+## жертву оглушаем, дешнувшего плавно возвращаем на прежнюю полосу.
+func _check_slime_collisions() -> void:
+	var all: Array[RacerSlime] = [slime]
+	for bot in _bots:
+		all.append(bot)
+
+	for a in all:
+		if not a.is_dashing():
+			continue
+		var a_rect := a.get_body_rect()
+		for b in all:
+			if a == b:
+				continue
+			if a_rect.intersects(b.get_body_rect()):
+				b.bump()
+				a.return_to_lane(a.get_dash_from_lane())
+				break
 
 # ============================================
 # КОНЕЦ ЗАЕЗДА

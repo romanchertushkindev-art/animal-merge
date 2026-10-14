@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="AnimalMerge"
-run/main_scene="uid://c24sc0k4bs2q1"
+run/main_scene="uid://bpsgdsswgdppb"
 config/features=PackedStringArray("4.7", "Forward Plus")
 config/icon="res://icon.svg"
 

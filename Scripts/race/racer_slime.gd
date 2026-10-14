@@ -36,6 +36,7 @@ signal finished()
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D
 @onready var collision_shape: CollisionShape2D = $CollisionShape2D
 @onready var effects: AnimatedSprite2D = $Effects
+@onready var overhead_pointer: AnimatedSprite2D = $OverheadPointer
 
 # ============================================
 # СОСТОЯНИЕ
@@ -46,12 +47,31 @@ var _vy: float = 0.0          # вертикальная скорость (то�
 var _grounded: bool = true
 var _bot_timer: float = 0.0   # таймер бота до следующей попытки сменить полосу
 var obstacles_layer: TileMapLayer = null   # ставит менеджер, чтобы бот видел препятствия
+var _dashing: bool = false      # идёт ли деш (смена полосы на земле)
+var _dash_from_lane: int = -1   # полоса, с которой дешнули (для отката)
+var _stun_timer: float = 0.0    # оглушение: пока > 0 не едем вперёд
 
 # ============================================
 # СОСТОЯНИЕ (публичный доступ)
 # ============================================
 func is_grounded() -> bool:
 	return _grounded
+
+func is_dashing() -> bool:
+	return _dashing
+
+func get_dash_from_lane() -> int:
+	return _dash_from_lane
+
+## Оглушение: слизень ненадолго перестаёт ехать вперёд.
+func bump() -> void:
+	_stun_timer = 0.5
+
+## Плавно вернуться на полосу (после неудачного деша в другого слизня).
+func return_to_lane(target: int) -> void:
+	lane = clampi(target, 0, lane_y.size() - 1)
+	_dashing = false
+	# Y сам плавно подъедет через move_toward в _physics_process
 
 ## Включает/выключает коллизию в зависимости от состояния.
 ## Вызывается при старте, прыжке и приземлении.
@@ -72,13 +92,18 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
 	if not _alive:
 		return
-
-	# Горизонталь: всегда едем вправо
-	position.x += speed * delta
+		
+	# Горизонталь: едем вправо (оглушён — стоим на месте)
+	if _stun_timer > 0.0:
+		_stun_timer -= delta
+	else:
+		position.x += speed * delta
 
 	if _grounded:
 		# На земле: плавно к своей полосе (если только что её сменили)
 		position.y = move_toward(position.y, lane_y[lane], lane_speed * delta)
+		if _dashing and absf(position.y - lane_y[lane]) < 0.5:
+			_dashing = false
 	else:
 		# В прыжке: баллистика, приземляемся на lane_y[lane]
 		_vy += gravity * delta
@@ -134,9 +159,11 @@ func _unhandled_input(event: InputEvent) -> void:
 func switch_lane(dir: int) -> void:
 	if _grounded == false:
 		return
-		 
+	
+	_dash_from_lane = lane
 	playDash(dir)
 	lane = clampi(lane + dir, 0, lane_y.size() - 1)
+	_dashing = true
 
 func playDash(dir: int) -> void: 
 	if lane == 0 and dir == -1 or lane == 2 and dir == 1:
@@ -159,6 +186,7 @@ func playJump() -> void:
 func jump() -> void:
 	if not _grounded:
 		return
+	_dashing = false
 	playJump()
 	_grounded = false
 	_vy = -jump_velocity
@@ -210,6 +238,8 @@ func apply_slime(id: String, uid: int) -> void:
 		sprite.sprite_frames = SlimeBase._get_frames_for(sprite.sprite_frames, data.sheet_texture)
 	if sprite and sprite.sprite_frames and sprite.sprite_frames.has_animation("run_right"):
 		sprite.play("run_right")
+		
+	overhead_pointer.visible = !is_bot
 
 func race_stat(stat: String) -> float:
 	if _uid >= 0:

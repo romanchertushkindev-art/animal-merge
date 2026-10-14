@@ -5,6 +5,7 @@
 [ext_resource type="Texture2D" uid="uid://c010nyqiv8dy" path="res://Sprites/slimes/slime_shadow.png" id="3_shadow"]
 [ext_resource type="Texture2D" uid="uid://bbynfdcb2ob74" path="res://Sprites/race/effects/dash.png" id="4_vk2b8"]
 [ext_resource type="Texture2D" uid="uid://7s0g6535v6nq" path="res://Sprites/race/effects/jump.png" id="5_vk2b8"]
+[ext_resource type="Texture2D" uid="uid://87xvamcjxhyv" path="res://Sprites/race/pointers/ovehead_pointer.png" id="6_hurmf"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_body"]
 size = Vector2(28, 28)
@@ -140,6 +141,77 @@ animations = [{
 "speed": 30.0
 }]
 
+[sub_resource type="AtlasTexture" id="AtlasTexture_qspja"]
+atlas = ExtResource("6_hurmf")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_kwwbn"]
+atlas = ExtResource("6_hurmf")
+region = Rect2(32, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_xe7m1"]
+atlas = ExtResource("6_hurmf")
+region = Rect2(64, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_1oy1c"]
+atlas = ExtResource("6_hurmf")
+region = Rect2(96, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_fmxo0"]
+atlas = ExtResource("6_hurmf")
+region = Rect2(128, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_s276c"]
+atlas = ExtResource("6_hurmf")
+region = Rect2(160, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_jdhlo"]
+atlas = ExtResource("6_hurmf")
+region = Rect2(192, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_w2m2b"]
+atlas = ExtResource("6_hurmf")
+region = Rect2(224, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_dsvho"]
+atlas = ExtResource("6_hurmf")
+region = Rect2(256, 0, 32, 32)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_v2o47"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_qspja")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_kwwbn")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_xe7m1")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_1oy1c")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_fmxo0")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_s276c")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_jdhlo")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_w2m2b")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_dsvho")
+}],
+"loop": 1,
+"name": &"default",
+"speed": 10.0
+}]
+
 [node name="RacerSlime" type="CharacterBody2D" unique_id=385088129]
 position = Vector2(3, -4)
 script = ExtResource("1_racer")
@@ -162,3 +234,9 @@ shape = SubResource("RectangleShape2D_body")
 position = Vector2(0, 30)
 sprite_frames = SubResource("SpriteFrames_mca0q")
 animation = &"jump"
+
+[node name="OverheadPointer" type="AnimatedSprite2D" parent="." unique_id=698895236]
+position = Vector2(0, -36)
+sprite_frames = SubResource("SpriteFrames_v2o47")
+autoplay = "default"
+frame_progress = 0.05043355
