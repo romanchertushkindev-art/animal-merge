@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dqwifx5qpwp7n"
-path="res://.godot/imported/ob_crystal.png-1df68039a5bcad3670c6f9898c4097c8.ctex"
+uid="uid://dw1wy5tqbblt7"
+path="res://.godot/imported/spritesheet.png-8555f3cb11bce8fa77b0e5da36ac12ce.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Sprites/race/ob_crystal.png"
-dest_files=["res://.godot/imported/ob_crystal.png-1df68039a5bcad3670c6f9898c4097c8.ctex"]
+source_file="res://Sprites/tilsets/spritesheet.png"
+dest_files=["res://.godot/imported/spritesheet.png-8555f3cb11bce8fa77b0e5da36ac12ce.ctex"]
 
 [params]
 

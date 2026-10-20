@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bb20q24md6bj5"
-path="res://.godot/imported/track_ground.png-adea8fe9f8fcbe3c8a7aa205a3d79d27.ctex"
+uid="uid://bl6fbk45x3eks"
+path="res://.godot/imported/jump_btn.png-618c61e645eb3cfebcb730bfe090e2a8.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Sprites/race/track_ground.png"
-dest_files=["res://.godot/imported/track_ground.png-adea8fe9f8fcbe3c8a7aa205a3d79d27.ctex"]
+source_file="res://Sprites/race/ui/jump_btn.png"
+dest_files=["res://.godot/imported/jump_btn.png-618c61e645eb3cfebcb730bfe090e2a8.ctex"]
 
 [params]
 

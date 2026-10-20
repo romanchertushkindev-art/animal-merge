@@ -7,6 +7,7 @@
 [ext_resource type="Texture2D" uid="uid://7s0g6535v6nq" path="res://Sprites/race/effects/jump.png" id="5_vk2b8"]
 [ext_resource type="Texture2D" uid="uid://87xvamcjxhyv" path="res://Sprites/race/pointers/ovehead_pointer.png" id="6_hurmf"]
 [ext_resource type="Texture2D" uid="uid://d14yop2gkafuc" path="res://Sprites/race/pointers/stun_pointer.png" id="7_5andg"]
+[ext_resource type="Script" uid="uid://xkkawv7sv8hr" path="res://Scripts/race/upgrades/dash_right.gd" id="8_kp04i"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_body"]
 size = Vector2(28, 28)
@@ -274,4 +275,7 @@ position = Vector2(0, -34)
 sprite_frames = SubResource("SpriteFrames_v2o47")
 animation = &"bump"
 autoplay = "pointer"
-frame_progress = 0.25943407
+frame_progress = 0.10348392
+
+[node name="DashUpgrade" type="Node" parent="." unique_id=1321642781]
+script = ExtResource("8_kp04i")

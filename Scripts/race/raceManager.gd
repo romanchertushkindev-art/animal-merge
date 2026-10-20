@@ -60,11 +60,13 @@ var _bots: Array[RacerSlime] = []
 var _countdown: float = 0.0      # секунды до старта (3, 2, 1)
 var _go_timer: float = 0.0       # сколько ещё показывать «GO!»
 var _countdown_label: Label = null
+var _bot_dash_lock: float = 0.0
 
 # ============================================
 # ИНИЦИАЛИЗАЦИЯ
 # ============================================
 func _ready() -> void:
+	_spawn_bots()
 	_finish_x = finish_layer.global_position.x if finish_layer else 100000.0
 	_setup_countdown()
 	_open_selection()
@@ -124,11 +126,11 @@ func _start_run(slime_id: String, uid: int) -> void:
 	slime.apply_slime(slime_id, uid)
 	_start_x = slime.position.x
 	slime.speed = base_speed + slime.race_stat("race_speed") * speed_per_stat
-
+	
 	_running = true
 	_countdown = 3.0
 	_go_timer = 0.0
-	_spawn_bots()
+
 	print("[Race] Заезд: %s (uid %d), скорость %d px/с" % [slime_id, uid, roundi(slime.speed)])
 
 ## Спавнит ботов-слаймов: те же бегуны, но с is_bot = true.
@@ -171,6 +173,7 @@ func _process(delta: float) -> void:
 			for bot in _bots:
 				bot.start()
 			_go_timer = 0.6
+			_bot_dash_lock = 1.0
 		else:
 			_countdown_label.text = str(ceili(_countdown))
 		return
@@ -180,6 +183,14 @@ func _process(delta: float) -> void:
 		_go_timer -= delta
 		if _go_timer <= 0.0:
 			_countdown_label.text = ""
+			
+	if _bot_dash_lock > 0.0:
+		_bot_dash_lock -= delta
+		for bot in _bots:
+			bot.can_dash = false
+		if _bot_dash_lock <= 0.0:
+			for bot in _bots:
+				bot.can_dash = true
 
 	_check_hits()
 	_check_slime_collisions()
@@ -244,7 +255,7 @@ func _check_slime_collisions() -> void:
 		for b in all:
 			if a == b:
 				continue
-			if a_rect.intersects(b.get_body_rect()):
+			if a_rect.intersects(b.get_body_rect()) and a.can_dash:
 				b.bump()
 				a.return_to_lane(a.get_dash_from_lane())
 				break
@@ -322,3 +333,7 @@ func _on_retry() -> void:
 func _on_quit() -> void:
 	_clear_result_dialog()
 	SceneTransition.change_scene("res://Scenes/main.tscn", 1)
+
+
+func jump() -> void:
+	pass # Replace with function body.

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://3q0lfq13fhv"
-path="res://.godot/imported/ob_rock.png-0c77cf82658e8d4c07626bdc3c21cf6b.ctex"
+uid="uid://cg8q44856jtmn"
+path="res://.godot/imported/line_swap_btn_down.png-10912babb0289325525e3b25cd78191e.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Sprites/race/ob_rock.png"
-dest_files=["res://.godot/imported/ob_rock.png-0c77cf82658e8d4c07626bdc3c21cf6b.ctex"]
+source_file="res://Sprites/race/ui/line_swap_btn_down.png"
+dest_files=["res://.godot/imported/line_swap_btn_down.png-10912babb0289325525e3b25cd78191e.ctex"]
 
 [params]
 

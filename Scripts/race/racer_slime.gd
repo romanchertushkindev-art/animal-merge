@@ -50,6 +50,7 @@ var obstacles_layer: TileMapLayer = null   # ставит менеджер, чт
 var _dashing: bool = false      # идёт ли деш (смена полосы на земле)
 var _dash_from_lane: int = -1   # полоса, с которой дешнули (для отката)
 var _stun_timer: float = 0.0    # оглушение: пока > 0 не едем вперёд
+var can_dash: bool = true      # false = деш заблокирован (ставит менеджер)
 
 # ============================================
 # СОСТОЯНИЕ (публичный доступ)
@@ -167,9 +168,12 @@ func _unhandled_input(event: InputEvent) -> void:
 		jump()
 
 func switch_lane(dir: int) -> void:
+	print(333)
 	if _grounded == false:
 		return
-	
+	if not can_dash:
+		return
+		
 	_dash_from_lane = lane
 	playDash(dir)
 	lane = clampi(lane + dir, 0, lane_y.size() - 1)

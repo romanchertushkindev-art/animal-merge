@@ -1,0 +1,74 @@
+[gd_scene format=3 uid="uid://casn187u1r10p"]
+
+[ext_resource type="Texture2D" uid="uid://c5i84wdwwlvek" path="res://Sprites/race/ui/line_swap_btn.png" id="1_ttpej"]
+[ext_resource type="Texture2D" uid="uid://cg8q44856jtmn" path="res://Sprites/race/ui/line_swap_btn_down.png" id="2_7tgn2"]
+[ext_resource type="Texture2D" uid="uid://bl6fbk45x3eks" path="res://Sprites/race/ui/jump_btn.png" id="3_embe0"]
+[ext_resource type="Texture2D" uid="uid://cur1v61manntw" path="res://Sprites/race/ui/dash_btn.png" id="4_a1erh"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_v2o47"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mca0q"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_u7w0x"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_venai"]
+
+[node name="RaceUi" type="CanvasLayer" unique_id=270097912]
+
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=1613841754]
+offset_right = 640.0
+offset_bottom = 360.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer" unique_id=1208687631]
+layout_mode = 2
+size_flags_vertical = 8
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/HBoxContainer" unique_id=1874938782]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 8
+
+[node name="Up" type="Button" parent="MarginContainer/HBoxContainer/VBoxContainer" unique_id=1588638224]
+custom_minimum_size = Vector2(30, 30)
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_styles/normal = SubResource("StyleBoxFlat_v2o47")
+icon = ExtResource("1_ttpej")
+flat = true
+expand_icon = true
+
+[node name="Down" type="Button" parent="MarginContainer/HBoxContainer/VBoxContainer" unique_id=260099481]
+custom_minimum_size = Vector2(30, 30)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_mca0q")
+icon = ExtResource("2_7tgn2")
+flat = true
+expand_icon = true
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/HBoxContainer" unique_id=2097359070]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Jump" type="Button" parent="MarginContainer/HBoxContainer/HBoxContainer" unique_id=563973800]
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_u7w0x")
+icon = ExtResource("3_embe0")
+flat = true
+icon_alignment = 1
+expand_icon = true
+
+[node name="Dash" type="Button" parent="MarginContainer/HBoxContainer/HBoxContainer" unique_id=1511699115]
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 2
+size_flags_horizontal = 10
+size_flags_vertical = 4
+theme_override_styles/normal = SubResource("StyleBoxFlat_venai")
+icon = ExtResource("4_a1erh")
+flat = true
+expand_icon = true

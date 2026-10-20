@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://10wnt07j145x"
-path="res://.godot/imported/bg_mountains_far.png-aa7f92f89606c8b4e50b197d41fea276.ctex"
+uid="uid://bndks7r37pb4v"
+path="res://.godot/imported/Sprite-0002.png-d72da6c2365f21724f9a5669122ac905.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Sprites/race/bg_mountains_far.png"
-dest_files=["res://.godot/imported/bg_mountains_far.png-aa7f92f89606c8b4e50b197d41fea276.ctex"]
+source_file="res://Sprites/tilsets/Sprite-0002.png"
+dest_files=["res://.godot/imported/Sprite-0002.png-d72da6c2365f21724f9a5669122ac905.ctex"]
 
 [params]
 
